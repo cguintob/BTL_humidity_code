@@ -1,0 +1,6 @@
+2024-02-15\ 11:04:51.130762_LOG_AHT10.txt
+2024-02-15\ 11:11:34.425612_LOG_AHT10.txt
+2024-02-15\ 12:22:40.712767_LOG_AHT10.txt
+dataReader.py~
+sensorData.py~
+data_file7.txt
