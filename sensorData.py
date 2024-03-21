@@ -30,7 +30,7 @@ def readserial(comport, baudrate, timestamp = False):
     counter = 0
 
     # This variable lets us change the data file without modifying too much code.
-    file = "data_one-sec_1.txt"
+    file = "data_one-sec_2.txt"
 
     ''' This section of code empties the data file each time it is 
     run so that only the data from the most recent run are collected. '''
