@@ -1,0 +1,25 @@
+e:22.82 C t = 2024-02-15 11:11:34.428194 
+ ture:22.81 C t = 2024-02-15 11:11:34.428620 
+ Humidity:21.74%  Temperature:22.81 C t = 2024-02-15 11:11:34.429776 
+ Humidity:21.73%  Temperature:22.82 C t = 2024-02-15 11:11:34.430912 
+ Humidity:21.58%  Temperature:22.82 C t = 2024-02-15 11:11:34.432510 
+ Starting up... t = 2024-02-15 11:11:35.353957 
+ AHT10 running t = 2024-02-15 11:11:35.492993 
+ Humidity:0.00%  Temperature:-50.00 C t = 2024-02-15 11:11:35.537992 
+ Humidity:0.00%  Temperature:-50.00 C t = 2024-02-15 11:11:36.550010 
+ Humidity:21.35%  Temperature:22.80 C t = 2024-02-15 11:11:37.631009 
+ Humidity:21.29%  Temperature:22.83 C t = 2024-02-15 11:11:38.711957 
+ Humidity:21.27%  Temperature:22.80 C t = 2024-02-15 11:11:39.793986 
+ Humidity:21.24%  Temperature:22.80 C t = 2024-02-15 11:11:40.874937 
+ Humidity:21.23%  Temperature:22.80 C t = 2024-02-15 11:11:41.955927 
+ Humidity:21.22%  Temperature:22.79 C t = 2024-02-15 11:11:43.037913 
+ Humidity:21.21%  Temperature:22.77 C t = 2024-02-15 11:11:44.118905 
+ Humidity:21.18%  Temperature:22.79 C t = 2024-02-15 11:11:45.199865 
+ Humidity:21.22%  Temperature:22.78 C t = 2024-02-15 11:11:46.281880 
+ Humidity:21.20%  Temperature:22.79 C t = 2024-02-15 11:11:47.362870 
+ Humidity:21.19%  Temperature:22.77 C t = 2024-02-15 11:11:48.443861 
+ Humidity:21.21%  Temperature:22.78 C t = 2024-02-15 11:11:49.524856 
+ Humidity:21.20%  Temperature:22.78 C t = 2024-02-15 11:11:50.606890 
+ Humidity:21.20%  Temperature:22.78 C t = 2024-02-15 11:11:51.687785 
+ Humidity:21.20%  Temperature:22.77 C t = 2024-02-15 11:11:52.768773 
+ 
