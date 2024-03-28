@@ -8,24 +8,47 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Like in sensorData.py, this variable prevents us from changing too much code.
-file = "data_one-sec_2.txt"
+file1 = "data_one-sec_3.txt"
 
-# These lists will adopt the appropriate values from our data file.
+''' These data files are from the National Weather Service for Charlottesville airport.
+They will be used for comparison with our Arduino data. '''
+file2 = "weather_data_3-21_3-28.txt"
+file3 = "hourly_precip.txt"
+
+# These lists will adopt the appropriate values from our data files.
 index = []
-times = []
+dates_and_times = []
 humidities = []
 temps = []
+
+weather_data_times = []
+weather_data_temps = []
+weather_data_hums = []
+
+precip_times = []
+precips = []
 
 ''' This for loop puts the appropriate data into the appropriate lists.
 Note that times[] contains both the data from the second column and the
 data from the third column, separated by a newline character. This will
 be useful for plotting the labels along the x-axis. '''
-for line in open(file, "r"):
+for line in open(file1, "r"):
     lines = [i for i in line.split()]
     index.append(lines[0])
-    times.append(lines[1] + "\n" + lines[2])
+    dates_and_times.append(lines[1] + "\n" + lines[2])
     humidities.append(lines[3])
     temps.append(lines[4])
+
+for line in open(file2, "r"):
+    lines = [i for i in line.split()]
+    weather_data_times.append(lines[1])
+    weather_data_temps.append(lines[2])
+    weather_data_hums.append(lines[4])
+
+for line in open(file3, "r"):
+    lines = [i for i in line.split()]
+    precip_times.append(lines[1])
+    precips.append(lines[2])
 
 ''' I implemented this list 3/14/2024. Originally, when I stopped my
 two-week-long data collection and I plotted my data, each tick on the
@@ -47,7 +70,7 @@ step = len(index) / n_desired_ticks
 
 # This while loop fills the new list with step values.
 while n < n_desired_ticks:
-    indexed_times.append(times[n * step])
+    indexed_times.append(dates_and_times[n * step])
     n += 1
 
 ''' Originally, when I plotted the x-ticks, I had the following:
@@ -83,21 +106,29 @@ while num < len(index):
     num += 1
 '''
 
+weather_data_points = np.linspace(0, len(index), len(weather_data_times))
+precip_points = np.linspace(0, len(index), len(precips))
+
 # This section of code plots the humidities.
 hum = plt.figure(1)
 plt.title("Humidities at Various Times")
+plt.xlabel("Date and Time")
 plt.ylabel("Relative Humidity (%)")
 plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
 plt.plot(index, humidities, marker = "o", c = "g")
 # plt.plot(index, pred_humidity, marker = "o", c = "r")
+plt.plot(weather_data_points, weather_data_hums, marker = "o", c = "r")
+plt.plot(precip_points, precips, marker = "o", c = "b")
 hum.show()
 
 # This section of code plots the temperatures.
 temp = plt.figure(2)
 plt.title("Temperatures at Various Times")
+plt.xlabel("Date and Time")
 plt.ylabel("Temperature (C)")
 plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
 plt.plot(index, temps, marker = "o", c = "g")
+plt.plot(weather_data_points, weather_data_temps, marker = "o", c = "r")
 temp.show()
 
 # This command is necessary for showing the plots separately, for some reason.
@@ -120,3 +151,44 @@ input()
 # plt.gca().xaxis.set_major_formatter(dates.DateFormatter('%Y-%m-%d'))
 # plt.gca().xaxis.set_major_locator(dates.DayLocator())
 # plt.plot_date(timestamps, humidities, marker = "o", c = "g", linestyle = "solid")
+
+
+
+
+''' comparison_temps = []
+comparison_hums = []
+m = 0
+k = 0
+while k < len(weather_data_times):
+    print(m, k)
+    if times[m] != weather_data_times[k]:
+        comparison_temps.append(0)
+        comparison_hums.append(0)
+    else:
+        if weather_data_times[k] != "NaN":
+            comparison_temps.append(0)
+            comparison_hums.append(0)
+        else:
+            comparison_temps.append(weather_data_temps[k])
+            comparison_hums.append(weather_data_hums[k])
+
+    k += 1
+    m += int(len(index)/len(weather_data_times))
+
+print(len(comparison_temps), len(comparison_hums))
+'''
+'''
+for m in range(len(index)):
+    print(m)
+    for k in range(len(weather_data_times)):
+        if times[m] != weather_data_times[k]:
+            comparison_temps.append(0)
+            comparison_hums.append(0)
+        else:
+            if weather_data_times[k] != "NaN":
+                comparison_temps.append(0)
+                comparison_hums.append(0)
+            else:
+                comparison_temps.append(weather_data_temps[k])
+                comparison_hums.append(weather_data_hums[k])
+'''
