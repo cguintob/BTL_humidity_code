@@ -14,5 +14,5 @@ This repository contains a few data files, the Python scripts, as well as the
 Arduino code. Everything is run in a Linux terminal (except for the Arduino
 code, which is run in the Arduino processor), using the commands
 
-python sensorData.py\n
+python sensorData.py
 python dataReader.py
