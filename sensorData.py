@@ -15,6 +15,7 @@ in "Datetime" that specifically accesses the date. '''
 import serial
 import datetime
 from datetime import date
+import sys
 
 ''' This function reads the data stream from the Arduino. The 
 COM port tells the program where to look for the data, the 
@@ -30,7 +31,7 @@ def readserial(comport, baudrate, timestamp = False):
     counter = 0
 
     # This variable lets us change the data file without modifying too much code.
-    file = "data_one-sec_2.txt"
+    file = sys.argv[1]
 
     ''' This section of code empties the data file each time it is 
     run so that only the data from the most recent run are collected. '''
@@ -63,8 +64,8 @@ def readserial(comport, baudrate, timestamp = False):
         else:
 
             # These are messages that confirm that the program is working.
-            if (counter % 10 == 0):
-                print("Gathering data. Please be patient. It's working, I promise.")
+            # if (counter % 10 == 0):
+            #    print("Gathering data. Please be patient. It's working, I promise.")
             
             # Day gives the current date; time gives the current time in hours:minutes.
             day = date.today()
@@ -81,10 +82,12 @@ def readserial(comport, baudrate, timestamp = False):
                 data_file.write(" ")
                 data_file.write(str(data))
                 data_file.write(" ")
+                print("Humidity: " + data + "%")
 
             # This writes the temperature to the data file.
             else:
                 data_file.write(str(data))
+                print("Temperature: " + data + " C")
                 data_file.write("\n")
                 data_file.close()
             counter += 1
