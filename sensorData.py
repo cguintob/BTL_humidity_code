@@ -6,16 +6,17 @@ the Arduino sends its data to the "server," this script
 code has finished uploading) takes the data, splices it,
 and puts each value into a data file when the value arrives. '''
 
-
 ''' "Serial" lets the Arduino send its information to the server,
 where the Python script can access it. "Datetime" contains
 information about the date and time of either the current
 moment or moments in the past and future. "Date" is a module
-in "Datetime" that specifically accesses the date. '''
-import serial
-import datetime
-from datetime import date
-import sys
+in "Datetime" that specifically accesses the date. "Sys" allows the
+user'''
+import serial             # Lets the Arduino send its information to the server
+import datetime           # Contains information about the date and time of either current moments or moments in the past and future
+from datetime import date # Module in "datetime" that specifically accesses the date
+import sys                # Allows the user to use command line arguments
+import requests           # Allows the user to get information from a url
 
 ''' This function reads the data stream from the Arduino. The 
 COM port tells the program where to look for the data, the 
@@ -27,17 +28,25 @@ Also,  1/timeout is the frequency at which the port is read. '''
 def readserial(comport, baudrate, timestamp = False):
     ser = serial.Serial(comport, baudrate, timeout = 0.1)  
 
-    # This counter is used to determine what parameter the values represent.
+    ''' These counters are used to determine what parameters 
+    the values represent. '''
     counter = 0
+    count_for_wttr = 0
 
-    # This variable lets us change the data file without modifying too much code.
-    file = sys.argv[1]
+    ''' This variable lets us change the data file without 
+    modifying too much code. '''
+    file1 = sys.argv[1]
+    file2 = sys.argv[2]
 
-    ''' This section of code empties the data file each time it is 
+    ''' This section of code empties the data files each time it is 
     run so that only the data from the most recent run are collected. '''
-    init_file = open(file, "w")
-    init_file.write("")
-    init_file.close
+    init_file1 = open(file1, "w")
+    init_file1.write("")
+    init_file1.close
+
+    init_file2 = open(file2, "w")
+    init_file2.write("")
+    init_file2.close
 
     # This while loop reads the code if the Arduino sends data to it.
     while True:
@@ -62,18 +71,15 @@ def readserial(comport, baudrate, timestamp = False):
 
         # This actually puts the data into a data file.
         else:
-
-            # These are messages that confirm that the program is working.
-            # if (counter % 10 == 0):
-            #    print("Gathering data. Please be patient. It's working, I promise.")
-            
-            # Day gives the current date; time gives the current time in hours:minutes.
+     
+            ''' Day gives the current date; time gives the current time 
+            in hours:minutes. '''
             day = date.today()
             time = datetime.datetime.now().strftime("%H:%M")
             
             # This writes everything except the temperature to the data file.
             if (counter % 2 == 0):
-                data_file = open(file, "a")
+                data_file = open(file1, "a")
                 data_file.write(str(int(0.5 * counter)))
                 data_file.write(" ")
                 data_file.write(str(day))
@@ -90,6 +96,25 @@ def readserial(comport, baudrate, timestamp = False):
                 print("Temperature: " + data + " C")
                 data_file.write("\n")
                 data_file.close()
+
+                ''' This uses wttr to get the current weather conditions. It only
+                needs to be called once per iteration of the Arduino reading, so
+                I put it under this else statement. '''
+                weather_data = open(file2, "a")
+                weather_data.write(str(count_for_wttr))
+                weather_data.write(" ")
+                weather_data.write(str(day))
+                weather_data.write(" ")
+                weather_data.write(str(time))
+                weather_data.write(" ")
+                url = "https://wttr.in/Charlottesville?format=%h+%t+%p"
+                res = requests.get(url)
+                converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
+                weather_data.write(str(converted_string))
+                weather_data.write("\n")
+                weather_data.close()
+                count_for_wttr += 1
+
             counter += 1
 
 ''' It's important to note that I open and close the data file each
@@ -113,7 +138,20 @@ if __name__ == '__main__':
 '''-------------------------------------------------------------------------'''
 
 
-
+'''
+            # This uses wttr to get the current weather conditions
+            weather_data = open(file2, "a")
+            weather_data.write(str(counter))
+            weather_data.write(" ")
+            weather_data.write(str(day))
+            weather_data.write(" ")
+            weather_data.write(str(time))
+            weather_data.write(" ")
+            url = "https://wttr.in/Charlottesville?format=%h+%t"
+            res = requests.get(url)
+            weather_data.write(res.text.split(chr(int(u'\xb0'))))
+            weather_data.write("\n")
+            weather_data.close() '''
 
 
 
@@ -242,3 +280,12 @@ with open(path, 'w+') as f:
         #    timestamp = time.strftime('%H:%M:%S')
         #    print(timestamp > data)
         # elif data:
+
+
+
+
+# converted_string = re.split("[%+F\xb0]", res.text)
+            # converted_string = re.sub("[^%d]", "", res.text)
+            # converted_string = res.text.translate({ord("\xb0"): None})
+            # converted_string = re.translate({ord("[\xb0+%F]"): None})
+            
