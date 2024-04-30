@@ -6,17 +6,83 @@ the Arduino sends its data to the "server," this script
 code has finished uploading) takes the data, splices it,
 and puts each value into a data file when the value arrives. '''
 
-''' "Serial" lets the Arduino send its information to the server,
-where the Python script can access it. "Datetime" contains
-information about the date and time of either the current
-moment or moments in the past and future. "Date" is a module
-in "Datetime" that specifically accesses the date. "Sys" allows the
-user'''
 import serial             # Lets the Arduino send its information to the server
 import datetime           # Contains information about the date and time of either current moments or moments in the past and future
 from datetime import date # Module in "datetime" that specifically accesses the date
 import sys                # Allows the user to use command line arguments
 import requests           # Allows the user to get information from a url
+import dataReader
+import keyboard
+# from pynput.keyboard import KeyCode, Key, Listener          # Allows for keyboard functionality
+
+''' To prevent modifying too much code each time I wanted to run a new data file,
+I made the user input their desired data files in the command line for the program
+to write to. This code checks to see if the arguments were supplied. If they were,
+then define the files and continue; if they weren't, either stop the program or
+define a default data file. '''
+try:
+    if (sys.argv[1].endswith(".txt")):
+        file1 = sys.argv[1]
+    else:
+        print("Use the following format: python sensorData.py [datafile1].txt (OPTIONAL [datafile2].txt)\n")
+        sys.exit(1)
+except IndexError:
+    print("Use the following format: python sensorData.py [datafile1].txt (OPTIONAL [datafile2].txt)\n")
+    sys.exit(1)
+            
+try:
+    if (sys.argv[2].endswith(".txt")):
+        file2 = sys.argv[2]
+    else:
+        file2 = "default_weather_data.txt"
+except IndexError:
+    file2 = "default_weather_data.txt"
+
+def wait():
+    if keyboard.is_pressed("space"):
+        return False
+    else:
+        return True
+
+'''
+rk = keyboard.record(until = "Esc")
+keyboard.play(rk, speed_factor = 1)
+if rk == "Esc":
+    print("Done!")
+    dataReader(file1, file2)
+    sys.exit(1)
+'''
+'''
+def on_press(key):
+    if key == KeyCode.from_char("z"):
+        print("Done!")
+        dataReader.plotting(file1, file2)
+    return False
+
+with Listener(on_press = on_press) as listener:
+    listener.join()
+  ''' 
+''' I intended to leave my code running for about five days in between
+my Thursday work and Tuesday research meeting and then show a plot of
+my measurements at the meeting, but at about 6 pm after I left, my code
+"crashed," leaving the WTTR data incomplete (i.e. the index and date
+were printed to the data file but the humidity and temperature were not).
+The reason for the "crash" was the following error: 
+
+requests.exceptions.SSLError: EOF occurred in violation of protocol (_ssl.c:618)
+
+This error, as I understand, is a result of the server and the website
+becoming out of sync, possibly due to overload (I was fetching data from
+the website every second for several hours before the "crash." So, I
+opened a session, which allows for the persistence of certain parameters
+across requests. The first line defines a session opened by requests, the
+second line defines an adapter (used to define interaction methods for an
+HTTP service, and the third line defines a prefix for which the adapter is
+to be used (any website with this prefix will use the adapter. This code
+was implemented 4/30/2024. '''
+sess = requests.Session()
+adapter = requests.adapters.HTTPAdapter(max_retries = 20)
+sess.mount("http://", adapter)
 
 ''' This function reads the data stream from the Arduino. The 
 COM port tells the program where to look for the data, the 
@@ -33,24 +99,9 @@ def readserial(comport, baudrate, timestamp = False):
     counter = 0
     count_for_wttr = 0
 
-    ''' This variable lets us change the data file without 
-    modifying too much code. '''
-    file1 = sys.argv[1]
-    file2 = sys.argv[2]
-
-    ''' This section of code empties the data files each time it is 
-    run so that only the data from the most recent run are collected. '''
-    init_file1 = open(file1, "w")
-    init_file1.write("")
-    init_file1.close
-
-    init_file2 = open(file2, "w")
-    init_file2.write("")
-    init_file2.close
-
     # This while loop reads the code if the Arduino sends data to it.
-    while True:
-
+    while wait():
+        
         ''' Each data point is taken from serial, read, decoded, 
         and stripped into a format the Python program can understand. ''' 
         data = ser.readline().decode().strip()
@@ -59,19 +110,19 @@ def readserial(comport, baudrate, timestamp = False):
         in the data file, but I let the Python program report it. '''
         if ((data == "Starting up...") or (data == "Sensor not running.") or (data == "AHT10 running")):
             print(data)
-
-        # These things are sent by the Arduino and shouldn't be included.
+            
+            # These things are sent by the Arduino and shouldn't be included.
         elif ((data == "") or (data == "0.00") or (data == "-50.00") or (data == "..") or (data == "up..")):
             continue
-
-        # This is only run if we're collecting a set number of measurements.
+            
+            # This is only run if we're collecting a set number of measurements.
         elif (data == "Done!"):
             print(data)
             break
-
-        # This actually puts the data into a data file.
+            
+            # This actually puts the data into a data file.
         else:
-     
+            
             ''' Day gives the current date; time gives the current time 
             in hours:minutes. '''
             day = date.today()
@@ -89,14 +140,14 @@ def readserial(comport, baudrate, timestamp = False):
                 data_file.write(str(data))
                 data_file.write(" ")
                 print("Humidity: " + data + "%")
-
-            # This writes the temperature to the data file.
+                
+                # This writes the temperature to the data file.
             else:
                 data_file.write(str(data))
                 print("Temperature: " + data + " C")
                 data_file.write("\n")
                 data_file.close()
-
+                
                 ''' This uses wttr to get the current weather conditions. It only
                 needs to be called once per iteration of the Arduino reading, so
                 I put it under this else statement. '''
@@ -107,16 +158,20 @@ def readserial(comport, baudrate, timestamp = False):
                 weather_data.write(" ")
                 weather_data.write(str(time))
                 weather_data.write(" ")
-                url = "https://wttr.in/Charlottesville?format=%h+%t+%p"
-                res = requests.get(url)
+                url = "http://wttr.in/Charlottesville?format=%h+%t+%p"
+                res = sess.get(url)
                 converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
                 weather_data.write(str(converted_string))
                 weather_data.write("\n")
                 weather_data.close()
                 count_for_wttr += 1
-
+                
             counter += 1
-
+            
+    print("Done!")
+    dataReader.number(1, file1, file2)
+    sys.exit(1)
+            
 ''' It's important to note that I open and close the data file each
 time I add a new set of measurements (hence why I use "a" instead of
 "w". I did this in case we need to stop data collection but didn't
@@ -136,6 +191,21 @@ if __name__ == '__main__':
 
 
 '''-------------------------------------------------------------------------'''
+
+
+
+
+''' This section of code empties the data files each time it is 
+run so that only the data from the most recent run are collected. '''
+# init_file1 = open(file1, "w")
+# init_file1.write("")
+# init_file1.close
+
+# init_file2 = open(file2, "w")
+# init_file2.write("")
+# init_file2.close
+
+
 
 
 '''
