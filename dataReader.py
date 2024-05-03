@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
-
-
 def plotting_from_outside_macro(file1, file2):
     
     # These lists will adopt the appropriate values from our data files.
@@ -161,8 +159,6 @@ def plotting_from_outside_macro(file1, file2):
     # This command is necessary for showing the plots separately, for some reason.
     input()
 
-
-
 def plotting_from_command_line(file1, file2):
 
     ''' Like in sensorData.py, these variables prevents us 
@@ -283,14 +279,12 @@ def plotting_from_command_line(file1, file2):
     
     input()
 
-
 # This function is necessary for distinguishing between plotting from sensorData.py and from using the command line.
 def number(num, file1, file2):
     if num == 1:
         plotting_from_outside_macro(file1, file2)
     else:
         plotting_from_command_line(file1, file2)
-
 
 # This checks to see if I'm plotting from sensorData.py or the command line.
 try:
@@ -301,11 +295,18 @@ except IndexError:
 
 
 
+# Code written by Christian Guinto-Brody for Professor Chris Neu's research group.
+
+
+
 '''-----------------------------------------------------------'''
-
-
-
 ''' Like in sensorData.py, the code from here on are ideas I was testing. '''
+
+
+
+
+
+
 
 # x = [dt.datetime.strptime(d, '%Y-%m-%d').date() for d in dates]
 

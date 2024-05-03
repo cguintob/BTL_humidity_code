@@ -11,9 +11,8 @@ import datetime           # Contains information about the date and time of eith
 from datetime import date # Module in "datetime" that specifically accesses the date
 import sys                # Allows the user to use command line arguments
 import requests           # Allows the user to get information from a url
-import dataReader
-import keyboard
-# from pynput.keyboard import KeyCode, Key, Listener          # Allows for keyboard functionality
+import keyboard           # Allows for keyboard functionality
+import dataReader         # Macro for plotting data
 
 ''' To prevent modifying too much code each time I wanted to run a new data file,
 I made the user input their desired data files in the command line for the program
@@ -44,24 +43,6 @@ def wait():
     else:
         return True
 
-'''
-rk = keyboard.record(until = "Esc")
-keyboard.play(rk, speed_factor = 1)
-if rk == "Esc":
-    print("Done!")
-    dataReader(file1, file2)
-    sys.exit(1)
-'''
-'''
-def on_press(key):
-    if key == KeyCode.from_char("z"):
-        print("Done!")
-        dataReader.plotting(file1, file2)
-    return False
-
-with Listener(on_press = on_press) as listener:
-    listener.join()
-  ''' 
 ''' I intended to leave my code running for about five days in between
 my Thursday work and Tuesday research meeting and then show a plot of
 my measurements at the meeting, but at about 6 pm after I left, my code
@@ -79,9 +60,13 @@ across requests. The first line defines a session opened by requests, the
 second line defines an adapter (used to define interaction methods for an
 HTTP service, and the third line defines a prefix for which the adapter is
 to be used (any website with this prefix will use the adapter. This code
-was implemented 4/30/2024. '''
+was implemented 4/30/2024.
+
+UPDATE 5/3/2024: I added the retry line because my code timed out after 
+about three days, which is longer than before, but not optimal. '''
 sess = requests.Session()
-adapter = requests.adapters.HTTPAdapter(max_retries = 20)
+retry = requests.packages.urllib3.util.retry.Retry(total = 5, backoff_factor = 0.1, status_forcelist = [500, 502, 503, 504])
+adapter = requests.adapters.HTTPAdapter(max_retries = retry)
 sess.mount("http://", adapter)
 
 ''' This function reads the data stream from the Arduino. The 
@@ -187,12 +172,40 @@ if __name__ == '__main__':
 
 
 
+# Code written by Christian Guinto-Brody for Professor Chris Neu's research group.
 
 
 
 '''-------------------------------------------------------------------------'''
+''' The code from here on are ideas I was testing and didn't work. '''
 
 
+
+
+
+
+
+
+# from pynput.keyboard import KeyCode, Key, Listener          # Allows for keyboard functionality
+
+'''
+rk = keyboard.record(until = "Esc")
+keyboard.play(rk, speed_factor = 1)
+if rk == "Esc":
+    print("Done!")
+    dataReader(file1, file2)
+    sys.exit(1)
+'''
+'''
+def on_press(key):
+    if key == KeyCode.from_char("z"):
+        print("Done!")
+        dataReader.plotting(file1, file2)
+    return False
+
+with Listener(on_press = on_press) as listener:
+    listener.join()
+  ''' 
 
 
 ''' This section of code empties the data files each time it is 
@@ -226,9 +239,6 @@ run so that only the data from the most recent run are collected. '''
 
 
 
-
-
-''' The code from here on are ideas I was testing and didn't work. '''
 
 # import matplotlib.dates as dates
 # time = dates.date2num(datetime.datetime.now())
