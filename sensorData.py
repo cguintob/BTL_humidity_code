@@ -84,13 +84,21 @@ def readserial(comport, baudrate, timestamp = False):
     counter = 0
     count_for_wttr = 0
 
+    ''' This array and this counter are here to prevent the data
+    from being added prematurely to the data files. When this happens,
+    the humidity and temperature are more likely to switch, which
+    taints the data. This correction was added 5/16/2024. '''
+    data_array = []
+    data_counter = 1
+
     # This while loop reads the code if the Arduino sends data to it.
     while wait():
         
         ''' Each data point is taken from serial, read, decoded, 
         and stripped into a format the Python program can understand. ''' 
         data = ser.readline().decode().strip()
-        
+        data_array.append(data)
+
         ''' The Arduino sends some extraneous information I don't want 
         in the data file, but I let the Python program report it. '''
         if ((data == "Starting up...") or (data == "Sensor not running.") or (data == "AHT10 running")):
@@ -107,51 +115,54 @@ def readserial(comport, baudrate, timestamp = False):
             
             # This actually puts the data into a data file.
         else:
-            
-            ''' Day gives the current date; time gives the current time 
-            in hours:minutes. '''
-            day = date.today()
-            time = datetime.datetime.now().strftime("%H:%M")
-            
-            # This writes everything except the temperature to the data file.
-            if (counter % 2 == 0):
-                data_file = open(file1, "a")
-                data_file.write(str(int(0.5 * counter)))
-                data_file.write(" ")
-                data_file.write(str(day))
-                data_file.write(" ")
-                data_file.write(str(time))
-                data_file.write(" ")
-                data_file.write(str(data))
-                data_file.write(" ")
-                print("Humidity: " + data + "%")
-                
-                # This writes the temperature to the data file.
+            # Only add data to the data files after "AHT10 running" has been passed.
+            if (data_array[data_counter - 1] != "AHT10 running"):
+                data_counter += 1
             else:
-                data_file.write(str(data))
-                print("Temperature: " + data + " C")
-                data_file.write("\n")
-                data_file.close()
+                ''' Day gives the current date; time gives the current time 
+                in hours:minutes. '''
+                day = date.today()
+                time = datetime.datetime.now().strftime("%H:%M")
                 
-                ''' This uses wttr to get the current weather conditions. It only
-                needs to be called once per iteration of the Arduino reading, so
-                I put it under this else statement. '''
-                weather_data = open(file2, "a")
-                weather_data.write(str(count_for_wttr))
-                weather_data.write(" ")
-                weather_data.write(str(day))
-                weather_data.write(" ")
-                weather_data.write(str(time))
-                weather_data.write(" ")
-                url = "http://wttr.in/Charlottesville?format=%h+%t+%p"
-                res = sess.get(url)
-                converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
-                weather_data.write(str(converted_string))
-                weather_data.write("\n")
-                weather_data.close()
-                count_for_wttr += 1
-                
-            counter += 1
+                # This writes everything except the temperature to the data file.
+                if (counter % 2 == 0):
+                    data_file = open(file1, "a")
+                    data_file.write(str(int(0.5 * counter)))
+                    data_file.write(" ")
+                    data_file.write(str(day))
+                    data_file.write(" ")
+                    data_file.write(str(time))
+                    data_file.write(" ")
+                    data_file.write(str(data))
+                    data_file.write(" ")
+                    print("Humidity: " + data + "%")
+                    
+                    # This writes the temperature to the data file.
+                else:
+                    data_file.write(str(data))
+                    print("Temperature: " + data + " C")
+                    data_file.write("\n")
+                    data_file.close()
+                    
+                    ''' This uses wttr to get the current weather conditions. It only
+                    needs to be called once per iteration of the Arduino reading, so
+                    I put it under this else statement. '''
+                    weather_data = open(file2, "a")
+                    weather_data.write(str(count_for_wttr))
+                    weather_data.write(" ")
+                    weather_data.write(str(day))
+                    weather_data.write(" ")
+                    weather_data.write(str(time))
+                    weather_data.write(" ")
+                    url = "http://wttr.in/Charlottesville?format=%h+%t+%p"
+                    res = sess.get(url)
+                    converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
+                    weather_data.write(str(converted_string))
+                    weather_data.write("\n")
+                    weather_data.close()
+                    count_for_wttr += 1
+                    
+                counter += 1
             
     print("Done!")
     dataReader.number(1, file1, file2)
