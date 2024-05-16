@@ -31,8 +31,22 @@ We use an Elegoo MEGA2560 R3 Arduino board with a fully calibrated ASAIR AHT10 h
 ## USING `aht10.ino`
 The first section of `aht10.ino1` initializes the sensor to do the following:
 1. Begin collecting data after 9600 ms
-2. Print > Starting up...
+2. Print "Starting up..."
 3. Check to see if the sensor is running and, if not, delay the data collection by 5000 ms and print > Sensor not running.
-4. If running, set the cycle mode and print > AHT10 runnning.
+4. Print "AHT10 running" and set the cycle mode if the sensor is running.
 The second section of the program is an infinite loop that collects measurements indefinitely via the following:
-1. Define > humidity to be 
+1. Define the variable "humidity" to be the humidity measured by the sensor. The definition accesses a function in `aht10` that measures the humidity. 
+2. Define the variable "temperature" in the same way, but pass through the respective function the opposite boolean so that the measurements are separate.
+3. Print the values to the serial monitor.
+4. Get the next measurement after 1000 ms.
+
+To execute `aht10.ino`, use the following command: `arduino --upload --port [SERIAL PORT] [PROGRAM.ino]`
+
+The components of the command are the following:
+1. `arduino` --- The executing function
+2. `--upload' --- Builds and compiles the program for use
+3. `--port' --- Signals to the program to print to the serial port. If it's not specified, it will use the last used port, so it's good to specify so we print to the port we want.
+4. `[SERIAL PORT]` --- The serial port to which we print. We use `/dev/ttyACM0`
+5. `[PROGRAM.ino]` --- The Arduino program. Ours is `aht10.ino`
+
+NOTE: When you execute this command, the sensor will NOT appear to be collecting measurements; however, it is. Check the serial monitor on the Arduino interface to be sure, or execture `sensorData.py` to see the values printed to the screen.
