@@ -29,10 +29,10 @@ We use an Elegoo MEGA2560 R3 Arduino board with a fully calibrated ASAIR AHT10 h
 
 
 ## USING `aht10.ino`
-The first section of `aht10.ino1` initializes the sensor to do the following:
+The first section of `aht10.ino` initializes the sensor to do the following:
 1. Begin collecting data after 9600 ms
 2. Print "Starting up..."
-3. Check to see if the sensor is running and, if not, delay the data collection by 5000 ms and print > Sensor not running.
+3. Check to see if the sensor is running and, if not, delay the data collection by 5000 ms and print "Sensor not running."
 4. Print "AHT10 running" and set the cycle mode if the sensor is running.  
 
 The second section of the program is an infinite loop that collects measurements indefinitely via the following:
