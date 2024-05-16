@@ -91,3 +91,46 @@ A similar program is `otherDataReader.py` and is executed with the following com
 `python otherDataReader.py [DATA FILE].txt`.
 
 This program takes only one file *for sensor measurements*. It is not to be used with WTTR data.
+
+
+## SUMMARY
+The following commands, in order, are how to run and plot the data from the sensor:
+1. `arduino --upload --port /dev/ttyACM0 aht10.ino`
+2. `sudo su`
+3. `python sensorData.py [DATA FILE 1].txt [DATA FILE 2].txt`
+4. `space`
+
+If there is already data available, use this command (can be run as a root user *or* not as a root user):
+
+`python dataReader.py [DATA FILE 1].txt [DATA FILE 2].txt`
+
+If the user wishes not to plot Charlottesville weather data, use this command:
+
+`python otherDataReader.py [DATA FILE].txt`
+
+
+## TROUBLESHOOTING
+### Check Permissions on Files and Programs
+If a program isn't working, check the permissions on it using the following command:
+
+`ls -l`
+
+If the desired file has root permissions, use the following command to change it to user permissions:
+
+`sudo chown [USER]:[USER] [FILE NAME]`
+
+`[USER]` is the name of the user found if you execute `pwd` (or when looking at the current directory) while `[FILE NAME]` is the file for which you want to change permissions. This command works if you are not a root user at the moment, and it will ask you to enter your sudo password. If you are a root user at the moment, omit `sudo` from the command.
+
+### Humidity and Temperature Values Switch
+Sometimes, when executing `sensorData.py`, the timing gets off with the sensor and the values that are listed as humidities are actually temperatures and vice versa. To fix this, simply use `Ctrl-C` and rerun the command with differnet data files.
+
+### Can't Push Files to GitHub
+Sometimes changes to your files and those that appear on GitHub become out of sync. This can happen if you accidentally commit something but forget to push it or if you modify your files in GitHub when you usually do it on the command line. To check the status of Git, execute the following command:
+
+`git status`
+
+This command will let you know whether your changes are up to date. If they aren't, you'll be ahead or behind by a certain number of commits. To fix this, execute the following command:
+
+`git reset --soft origin/[BRANCH NAME]`
+
+You can determine the branch name by running `git branch --show-current`.
