@@ -25,12 +25,14 @@ We use an Elegoo MEGA2560 R3 Arduino board with a fully calibrated ASAIR AHT10 h
 ### Miscellaneous/Housekeeping
 `README.md` --- Contains information about project and how to use programs  
 `.gitignore.txt` --- Contains files that are not tracked by Git (includes backup version `.gitignore.txt~`)  
-`.giattributes` --- Used for pushing files that are larger than the maximum allowed size for pushing
+`.gitattributes` --- Used for pushing files that are larger than the maximum allowed size for pushing
 
 
 ## USING `aht10.ino`
-`aht10.ino` must be opened outside the command line. The first section of code initializes the sensor to do the following:
+The first section of `aht10.ino1` initializes the sensor to do the following:
 1. Begin collecting data after 9600 ms
 2. Print > Starting up...
 3. Check to see if the sensor is running and, if not, delay the data collection by 5000 ms and print > Sensor not running.
 4. If running, set the cycle mode and print > AHT10 runnning.
+The second section of the program is an infinite loop that collects measurements indefinitely via the following:
+1. Define > humidity to be 
