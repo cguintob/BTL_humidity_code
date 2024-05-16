@@ -191,8 +191,8 @@ moment, omit `sudo` from the command.
 ### Humidity and Temperature Values Switch
 Sometimes, when executing `sensorData.py`, the timing gets off with the sensor 
 and the values that are listed as humidities are actually temperatures and vice 
-versa. To fix this, simply use `Ctrl-C` and rerun the command with different 
-data files.
+versa. To fix this, simply use `Ctrl-C` or `Ctrl-Z` (the latter is slightly
+nicer to the program) and rerun the command with different data files.
 
 ### Can't Push Files to GitHub
 Sometimes changes to your files and those that appear on GitHub become out of 
