@@ -11,21 +11,21 @@ We use an Elegoo MEGA2560 R3 Arduino board with a fully calibrated ASAIR AHT10 h
 `AHTxx.h`   --- Header file for arduino library
 
 ### Python Scripts
-`sensorData.py` --- Takes sensor data from serial port and writes it to data file; fetches weather data from Charlottesville using WTTR and writes it to separate data file\n
-`dataReader.py` --- Reads data from files and plots it\n
-`otherDataReader.py` --- Used like `dataReader.py` but without weather data from Charlottesville\n
+`sensorData.py` --- Takes sensor data from serial port and writes it to data file; fetches weather data from Charlottesville using WTTR and writes it to separate data file  
+`dataReader.py` --- Reads data from files and plots it  
+`otherDataReader.py` --- Used like `dataReader.py` but without weather data from Charlottesville  
 `sensorData.py~` `dataReader.py~` `otherDataReader.py~` --- Backup versions of each script
 
 ### Data Files, Plots, and Other Results
-`merged_data.txt` --- Contains all data taken since the start of the project; shows example of data format\n
-`all_humidities_until_5-2.png` `all_temperatures_until_5-2.png` --- Plots of all data (used `merged_data.txt` for data and `otherDataReader.py` for plotting)\n
-`humidities_apr-30_may-2.png` `temperatures_apr-30_may-2.png` --- Plots of local and Charlottesville data between 4/30/2024 and 5/2/2024 (used `dataReader.py` for plotting)\n
+`merged_data.txt` --- Contains all data taken since the start of the project; shows example of data format  
+`all_humidities_until_5-2.png` `all_temperatures_until_5-2.png` --- Plots of all data (used `merged_data.txt` for data and `otherDataReader.py` for plotting)  
+`humidities_apr-30_may-2.png` `temperatures_apr-30_may-2.png` --- Plots of local and Charlottesville data between 4/30/2024 and 5/2/2024 (used `dataReader.py` for plotting)  
 `Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project that contains above plots
 
 ### Miscellaneous/Housekeeping
-`README.md` --- Contains information about project and how to use programs\n
-`.gitignore.txt` --- Contains files that are not tracked by Git (includes backup version `.gitignore.txt~`)\n
-`.giattributes` --- Used for pushing files that are larger than the maximum allowed size for pushing\n
+`README.md` --- Contains information about project and how to use programs  
+`.gitignore.txt` --- Contains files that are not tracked by Git (includes backup version `.gitignore.txt~`)  
+`.giattributes` --- Used for pushing files that are larger than the maximum allowed size for pushing
 
 
 # USING `aht10.ino`
