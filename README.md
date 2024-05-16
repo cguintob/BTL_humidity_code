@@ -34,6 +34,7 @@ The first section of `aht10.ino1` initializes the sensor to do the following:
 2. Print "Starting up..."
 3. Check to see if the sensor is running and, if not, delay the data collection by 5000 ms and print > Sensor not running.
 4. Print "AHT10 running" and set the cycle mode if the sensor is running.  
+
 The second section of the program is an infinite loop that collects measurements indefinitely via the following:
 1. Define the variable "humidity" to be the humidity measured by the sensor. The definition accesses a function in `aht10` that measures the humidity. 
 2. Define the variable "temperature" in the same way, but pass through the respective function the opposite boolean so that the measurements are separate.
