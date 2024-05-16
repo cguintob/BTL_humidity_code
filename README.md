@@ -41,7 +41,9 @@ The second section of the program is an infinite loop that collects measurements
 3. Print the values to the serial monitor.
 4. Get the next measurement after 1000 ms.
 
-To execute `aht10.ino`, use the following command: `arduino --upload --port [SERIAL PORT] [PROGRAM].ino`
+To execute `aht10.ino`, use the following command: 
+
+`arduino --upload --port [SERIAL PORT] [PROGRAM].ino`
 
 The components of the command are the following:
 1. `arduino` --- The executing function
@@ -54,7 +56,9 @@ NOTE: When you execute this command, the sensor will *not* appear to be collecti
 
 
 ## USING `sensorData.py`
-`sensorData.py` is used with the following command: `python sensorData.py [DATA FILE 1].txt [DATA FILE 2].txt`
+`sensorData.py` is used with the following command:
+
+`python sensorData.py [DATA FILE 1].txt [DATA FILE 2].txt`
 1. `python` --- The executing function
 2. `sensorData.py` --- The Python program
 3. `[DATAFILE 1].txt` --- The necessary data file. Includes measurements from the sensor.
@@ -70,8 +74,14 @@ The unique features of this program are its use of `requests` and `keyboard`, tw
 ## USING `dataReader.py` and `otherDataReader.py`
 After the user hits the spacebar, `sensorData.py` will pass the two data files to which it was writing to `dataReader.py`, which will then plot them. 
 
-`dataReader.py` contains a special function called `number`, which takes two data files and another extra value as inputs. When used with `sensorData.py`, the extra value is set to be 1, letting the program know that it is being used with `sensorData.py` and that the two data files are those written to. When not used with `sensorData.py`, the extra value must be set to a value *not* equal to 1, letting the program know that it is being used *in the command line*. In this situation, the program is executed as follows: `python dataReader.py [DATA FILE 1].txt [DATA FILE 2].txt [NUMBER]`.
+`dataReader.py` contains a special function called `number`, which takes two data files and another extra value as inputs. When used with `sensorData.py`, the extra value is set to be 1, letting the program know that it is being used with `sensorData.py` and that the two data files are those written to. When not used with `sensorData.py`, the extra value must be set to a value *not* equal to 1, letting the program know that it is being used *in the command line*. In this situation, the program is executed as follows:
+
+`python dataReader.py [DATA FILE 1].txt [DATA FILE 2].txt [NUMBER]`.
 
 As before, `[DATA FILE 1].txt` contains measurements from the sensor while `[DATA FILE 2].txt` contains measurements from WTTR (that were previously collected). If nothing is passed for the latter file, `default_weather_data.txt` will be used.
 
-A similar program is `otherDataReader.py` and is executed with the following command: `python otherDataReader.py [DATA FILE].txt`. This program takes only one file *for sensor measurements*. It is not to be used with WTTR data.
+A similar program is `otherDataReader.py` and is executed with the following command:
+
+`python otherDataReader.py [DATA FILE].txt`.
+
+This program takes only one file *for sensor measurements*. It is not to be used with WTTR data.
