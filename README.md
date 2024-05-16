@@ -33,7 +33,7 @@ The first section of `aht10.ino1` initializes the sensor to do the following:
 1. Begin collecting data after 9600 ms
 2. Print "Starting up..."
 3. Check to see if the sensor is running and, if not, delay the data collection by 5000 ms and print > Sensor not running.
-4. Print "AHT10 running" and set the cycle mode if the sensor is running.
+4. Print "AHT10 running" and set the cycle mode if the sensor is running.  
 The second section of the program is an infinite loop that collects measurements indefinitely via the following:
 1. Define the variable "humidity" to be the humidity measured by the sensor. The definition accesses a function in `aht10` that measures the humidity. 
 2. Define the variable "temperature" in the same way, but pass through the respective function the opposite boolean so that the measurements are separate.
@@ -44,8 +44,8 @@ To execute `aht10.ino`, use the following command: `arduino --upload --port [SER
 
 The components of the command are the following:
 1. `arduino` --- The executing function
-2. `--upload' --- Builds and compiles the program for use
-3. `--port' --- Signals to the program to print to the serial port. If it's not specified, it will use the last used port, so it's good to specify so we print to the port we want.
+2. `--upload` --- Builds and compiles the program for use
+3. `--port` --- Signals to the program to print to the serial port. If it's not specified, it will use the last used port, so it's good to specify so we print to the port we want.
 4. `[SERIAL PORT]` --- The serial port to which we print. We use `/dev/ttyACM0`
 5. `[PROGRAM.ino]` --- The Arduino program. Ours is `aht10.ino`
 
