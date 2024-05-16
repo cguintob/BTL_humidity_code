@@ -82,13 +82,13 @@ After the user hits the spacebar, `sensorData.py` will pass the two data files t
 
 `dataReader.py` contains a special function called `number`, which takes two data files and another extra value as inputs. When used with `sensorData.py`, the extra value is set to be 1, letting the program know that it is being used with `sensorData.py` and that the two data files are those written to. When not used with `sensorData.py`, the extra value must be set to a value *not* equal to 1, letting the program know that it is being used *in the command line*. In this situation, the program is executed as follows:
 
-`python dataReader.py [DATA FILE 1].txt [DATA FILE 2].txt [NUMBER]`.
+`python dataReader.py [DATA FILE 1].txt [DATA FILE 2].txt [NUMBER]`
 
 As before, `[DATA FILE 1].txt` contains measurements from the sensor while `[DATA FILE 2].txt` contains measurements from WTTR (that were previously collected). If nothing is passed for the latter file, `default_weather_data.txt` will be used.
 
 A similar program is `otherDataReader.py` and is executed with the following command:
 
-`python otherDataReader.py [DATA FILE].txt`.
+`python otherDataReader.py [DATA FILE].txt`
 
 This program takes only one file *for sensor measurements*. It is not to be used with WTTR data.
 
