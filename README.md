@@ -6,8 +6,8 @@ We use an Elegoo MEGA2560 R3 Arduino board with a fully calibrated ASAIR AHT10 h
 
 ## REPOSITORY CONTENTS
 ### Sensor Files
-`aht10.ino` --- Initializes the sensor, measures humidity and temperature in room, and sends information to serial port
-`AHTxx.cpp` --- Arduino library
+`aht10.ino` --- Initializes the sensor, measures humidity and temperature in room, and sends information to serial port  
+`AHTxx.cpp` --- Arduino library  
 `AHTxx.h`   --- Header file for arduino library
 
 ### Python Scripts
@@ -28,4 +28,9 @@ We use an Elegoo MEGA2560 R3 Arduino board with a fully calibrated ASAIR AHT10 h
 `.giattributes` --- Used for pushing files that are larger than the maximum allowed size for pushing
 
 
-# USING `aht10.ino`
+## USING `aht10.ino`
+`aht10.ino` must be opened outside the command line. The first section of code initializes the sensor to do the following:
+1. Begin collecting data after 9600 ms
+2. Print > Starting up...
+3. Check to see if the sensor is running and, if not, delay the data collection by 5000 ms and print > Sensor not running.
+4. If running, set the cycle mode and print > AHT10 runnning.
