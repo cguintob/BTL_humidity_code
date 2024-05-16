@@ -70,6 +70,12 @@ The unique features of this program are its use of `requests` and `keyboard`, tw
 
 `requests` is used to get Charlottesville humidity, temperature, and precipitation values using WTTR, a "console-oriented weather forecast service" that allows users to collect meteorological data from anywhere in the world. The point of collecting this data for our purposes is to compare our measured values from the sensor with those outside in the city to see how the measured values fluctuate with the outside environment. This data is written to the second data file. `keyboard` allows the user to stop collecting data when they hit the spacebar. When the spacebar is hit, the program will terminate and plot the data using `dataReader.py`, which is imported into the program.
 
+NOTE: Because `keyboard` only works with root access, the user must be logged in as a root user to execute the function. This can be accomplished by running the following command:
+
+`sudo su`
+
+The user will then be prompted to enter their password. After that is entered, the program should be freely usable.
+
 
 ## USING `dataReader.py` and `otherDataReader.py`
 After the user hits the spacebar, `sensorData.py` will pass the two data files to which it was writing to `dataReader.py`, which will then plot them. 
