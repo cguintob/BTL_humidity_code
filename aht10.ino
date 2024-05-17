@@ -38,7 +38,7 @@ void loop() {
      int seconds = 0;
      int minutes = 10;
      int hours = 0;
-     while (counter < ((seconds + (minutes * 60) + (hours * 3600)) * points_per_second) {
+     while (counter < ((seconds + (minutes * 60) + (hours * 3600)) * points_per_second)) {
      	   float humidity = aht10.readHumidity(true);            
 	   float temperature = aht10.readTemperature(false);
 	   Serial.println(humidity);                              
