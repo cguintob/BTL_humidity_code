@@ -18,27 +18,41 @@ import dataReader         # Macro for plotting data
 I made the user input their desired data files in the command line for the program
 to write to. This code checks to see if the arguments were supplied. If they were,
 then define the files and continue; if they weren't, either stop the program or
-define a default data file. '''
+define a default data file.
+
+UPDATE: I have since added a system argument for the COM port so that I can use
+multiple Arduino boards at the same time. Each board connects to a different
+USB port on the PC, which means they each have a different COM port. So, the user
+can indicate which board they want to use based on the COM port they feed the
+program. This update was added 5/17/2024. '''
 try:
-    if (sys.argv[1].endswith(".txt")):
-        file1 = sys.argv[1]
-    else:
-        print("Use the following format: python sensorData.py [datafile1].txt (OPTIONAL [datafile2].txt)\n")
-        sys.exit(1)
+    port_num = sys.argv[1]
 except IndexError:
-    print("Use the following format: python sensorData.py [datafile1].txt (OPTIONAL [datafile2].txt)\n")
+    print("Use the following format: python sensorData.py [integer] [datafile1].txt (OPTIONAL [datafile2].txt)\n")
     sys.exit(1)
-            
+
 try:
     if (sys.argv[2].endswith(".txt")):
-        file2 = sys.argv[2]
+        file1 = sys.argv[2]
     else:
-        file2 = "default_weather_data.txt"
+        print("Use the following format: python sensorData.py [integer] [datafile1].txt (OPTIONAL [datafile2].txt)\n")
+        sys.exit(1)
 except IndexError:
-    file2 = "default_weather_data.txt"
+    print("Use the following format: python sensorData.py [integer] [datafile1].txt (OPTIONAL [datafile2].txt)\n")
+    sys.exit(1)
+
+try:
+    if (sys.argv[3].endswith(".txt")):
+        file2 = sys.argv[3]
+    else:
+        print("Use the following format: python sensorData.py [integer] [datafile1].txt (OPTIONAL [datafile2].txt)\n")
+        sys.exit(1)
+except IndexError:
+    print("Use the following format: python sensorData.py [integer] [datafile1].txt (OPTIONAL [datafile2].txt)\n")
+    sys.exit(1)
 
 def wait():
-    if keyboard.is_pressed("space"):
+    if keyboard.is_pressed("alt"):
         return False
     else:
         return True
@@ -84,99 +98,124 @@ def readserial(comport, baudrate, timestamp = False):
     counter = 0
     count_for_wttr = 0
 
-    ''' This array and this counter are here to prevent the data
-    from being added prematurely to the data files. When this happens,
-    the humidity and temperature are more likely to switch, which
-    taints the data. This correction was added 5/16/2024. '''
-    data_array = []
-    data_counter = 1
+    ''' This variable is used to correct the switching of the
+    humidity and temperature from the Arduino. It predominantly
+    helps to prevent any data from being written to files
+    before the Arduino outputs "AHT10 running." '''
+    tester = 0
 
     # This while loop reads the code if the Arduino sends data to it.
     while wait():
-        
+
         ''' Each data point is taken from serial, read, decoded, 
         and stripped into a format the Python program can understand. ''' 
         data = ser.readline().decode().strip()
-        data_array.append(data)
 
         ''' The Arduino sends some extraneous information I don't want 
         in the data file, but I let the Python program report it. '''
         if ((data == "Starting up...") or (data == "Sensor not running.") or (data == "AHT10 running")):
             print(data)
-            
-            # These things are sent by the Arduino and shouldn't be included.
+            if (data == "AHT10 running"):
+                tester = 1
         elif ((data == "") or (data == "0.00") or (data == "-50.00") or (data == "..") or (data == "up..")):
             continue
             
-            # This is only run if we're collecting a set number of measurements.
+        # This is only run if we're collecting a set number of measurements.
         elif (data == "Done!"):
             print(data)
-            break
+            dataReader.number(1, 1, file1, file2)
+            sys.exit(1)
             
-            # This actually puts the data into a data file.
+        # This actually puts the data into a data file.
         else:
-            # Only add data to the data files after "AHT10 running" has been passed.
-            if (data_array[data_counter - 1] != "AHT10 running"):
-                data_counter += 1
+            if (tester == 0):
+                continue
             else:
                 ''' Day gives the current date; time gives the current time 
-                in hours:minutes. '''
+                in hours:minutes:seconds. '''
                 day = date.today()
-                time = datetime.datetime.now().strftime("%H:%M")
-                
-                # This writes everything except the temperature to the data file.
-                if (counter % 2 == 0):
-                    data_file = open(file1, "a")
-                    data_file.write(str(int(0.5 * counter)))
-                    data_file.write(" ")
-                    data_file.write(str(day))
-                    data_file.write(" ")
-                    data_file.write(str(time))
-                    data_file.write(" ")
-                    data_file.write(str(data))
-                    data_file.write(" ")
-                    print("Humidity: " + data + "%")
-                    
+                time = datetime.datetime.now().strftime("%H:%M:%S")
+            
+                ''' This prevents the data from switching. The
+                Arduino now prints a counter to the serial
+                monitor, which is heard by Python. This try-
+                except statement tests the data to see if it's
+                an integer, which indicates that it is the counter.
+                If that counter is even, a humidity measurement
+                will be written to the file; if that counter
+                is odd, a temperature measurement will be
+                written to the file. This code was implemented
+                5/17/2024. '''
+                try:
+                    if (isinstance(int(data), int) == True):
+                        counter = int(data)
+                    else:
+                        raise ValueError
+                except ValueError:
+
+                    # This writes everything except the temperature to the data file.
+                    if (counter % 2 == 0):
+                        data_file = open(file1, "a")
+                        data_file.write(str(int(0.5 * counter)))
+                        data_file.write(" ")
+                        data_file.write(str(day))
+                        data_file.write(" ")
+                        data_file.write(str(time))
+                        data_file.write(" ")
+                        data_file.write(str(data))
+                        data_file.write(" ")
+                        print("Humidity: " + data + "%")
+                        
                     # This writes the temperature to the data file.
-                else:
-                    data_file.write(str(data))
-                    print("Temperature: " + data + " C")
-                    data_file.write("\n")
-                    data_file.close()
+                    else:
+                        data_file.write(str(data))
+                        print("Temperature: " + data + " C")
+                        data_file.write("\n")
+                        data_file.close()
+                        
+                        ''' This uses wttr to get the current weather conditions. It only
+                        needs to be called once per iteration of the Arduino reading, so
+                        I put it under this else statement. '''
+                        weather_data = open(file2, "a")
+                        weather_data.write(str(count_for_wttr))
+                        weather_data.write(" ")
+                        weather_data.write(str(day))
+                        weather_data.write(" ")
+                        weather_data.write(str(time))
+                        weather_data.write(" ")
+                        url = "http://wttr.in/Charlottesville?format=%h+%t+%p"
+                        res = sess.get(url)
+                        converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
+                        weather_data.write(str(converted_string))
+                        weather_data.write("\n")
+                        weather_data.close()
+                        count_for_wttr += 1
                     
-                    ''' This uses wttr to get the current weather conditions. It only
-                    needs to be called once per iteration of the Arduino reading, so
-                    I put it under this else statement. '''
-                    weather_data = open(file2, "a")
-                    weather_data.write(str(count_for_wttr))
-                    weather_data.write(" ")
-                    weather_data.write(str(day))
-                    weather_data.write(" ")
-                    weather_data.write(str(time))
-                    weather_data.write(" ")
-                    url = "http://wttr.in/Charlottesville?format=%h+%t+%p"
-                    res = sess.get(url)
-                    converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
-                    weather_data.write(str(converted_string))
-                    weather_data.write("\n")
-                    weather_data.close()
-                    count_for_wttr += 1
-                    
-                counter += 1
+                    counter += 1
             
     print("Done!")
-    dataReader.number(1, file1, file2)
+    dataReader.number(1, 1, file1, file2)
     sys.exit(1)
             
 ''' It's important to note that I open and close the data file each
 time I add a new set of measurements (hence why I use "a" instead of
-"w". I did this in case we need to stop data collection but didn't
+"w"). I did this in case we need to stop data collection but didn't
 want to lose our data. By continuously opening and closing the file,
 we save the data, preventing it from being lost. '''
 
 # This tells the program where to look for the AHT10 program.
 if __name__ == '__main__':
-    readserial('/dev/ttyACM0', 9600, True)
+    if (int(port_num) == 0):
+        readserial('/dev/ttyACM0', 9600, True)
+    elif (int(port_num) == 1):
+        readserial('/dev/ttyACM1', 9600, True)
+    elif (int(port_num) == 2):
+        readserial('/dev/ttyACM2', 9600, True)
+    elif (int(port_num) == 3):
+        readserial('/dev/ttyACM3', 9600, True)
+    else:
+        print("No COM port specified.")
+        sys.exit(1)
     # COM port, Baudrate, Show timestamp
     
 
@@ -184,6 +223,63 @@ if __name__ == '__main__':
 
 
 # Code written by Christian Guinto-Brody for Professor Chris Neu's research group.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

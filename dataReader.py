@@ -170,19 +170,21 @@ def plotting_from_command_line(file1, file2):
         if (sys.argv[1].endswith(".txt")):
             file1 = sys.argv[1]
         else:
-            print("Use the following format: python dataReader.py [datafile1].txt (OPTIONAL: [datafile2].txt) [number]\n")
+            print("Use the following format: python dataReader.py [datafile1].txt [datafile2].txt [number1] [number2]\n")
             sys.exit(1)
     except IndexError:
-        print("Use the following format: npython dataReader.py [datafile1].txt (OPTIONAL [datafile2].txt) [number]\n")
+        print("Use the following format: npython dataReader.py [number] [datafile1].txt [datafile2].txt [number1] [number2]\n")
         sys.exit(1)
         
     try:
         if (sys.argv[2].endswith(".txt")):
             file2 = sys.argv[2]
         else:
-            file2 = "default_weather_data.txt"
+            print("Use the following format: python dataReader.py [datafile1].txt [datafile2].txt [number]\n")
+            sys.exit(1)
     except IndexError:
-        file2 = "default_weather_data.txt"
+        print("Use the following format: python dataReader.py [datafile1].txt [datafile2].txt [number]\n")
+        sys.exit(1)
 
     # The remaining code is exactly the same as in plotting_from_outside_macro().
     index = []
@@ -280,22 +282,70 @@ def plotting_from_command_line(file1, file2):
     input()
 
 # This function is necessary for distinguishing between plotting from sensorData.py and from using the command line.
-def number(num, file1, file2):
-    if num == 1:
+def number(num1, num2, file1, file2):
+    if ((num1 == 1) and (num2 == 1)):
         plotting_from_outside_macro(file1, file2)
     else:
         plotting_from_command_line(file1, file2)
 
 # This checks to see if I'm plotting from sensorData.py or the command line.
-try:
-    number(sys.argv[3], sys.argv[1], sys.argv[2])
-except IndexError:
+if (len(sys.argv) > 4):
+    number(sys.argv[3], sys.argv[4], sys.argv[1], sys.argv[2]) # Command line
+else:
     print("Get ready...")
 
 
 
 
 # Code written by Christian Guinto-Brody for Professor Chris Neu's research group.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
