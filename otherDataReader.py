@@ -13,7 +13,7 @@ try:
         print("Use the following format: python dataReader.py [datafile1].txt\n")
         sys.exit(1)
 except IndexError:
-    print("Use the following format: npython dataReader.py [datafile1].txt\n")
+    print("Use the following format: python dataReader.py [datafile1].txt\n")
     sys.exit(1)
 
 index = []
@@ -29,7 +29,7 @@ for line in open(file1, "r"):
     temps.append(lines[4])
         
 for i in range(len(index) - 1):
-    if int(index[i + 1]) < int(index[i]):
+    if int(index[i + 1]) <= int(index[i]):
         index[i + 1] = int(index[i]) + 1
     else:
         continue
@@ -50,25 +50,33 @@ for i in range(len(humidities)):
     else:
         continue
 print("Percent of humidities in optimal range: " + str(float(n_optimal)/float(len(humidities)) * 100))
-        
+
+# These denote the lower and upper bounds for the humidity graph.
+lower_hum_range_limit = 0
+upper_hum_range_limit = 100
+
 hum = plt.figure(1)
 plt.title("Humidities at Various Times")
 plt.xlabel("Date and Time")
 plt.ylabel("Relative Humidity (%)")
-plt.ylim([0, 100])
+plt.ylim([lower_hum_range_limit, upper_hum_range_limit])
 plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
 plt.plot(index, humidities, marker = "+", c = "g", label = "Assembly Room")
 plt.plot([0, len(index)], [40, 40], c = "y", linewidth = 3.0)
 plt.plot([0, len(index)], [60, 60], c = "y", linewidth = 3.0, label = "Optimal Range")
 plt.legend(loc = "upper right")
-plt.text(0.375 * step, 90, str(float(n_optimal)/float(len(humidities)) * 100) + "% of humidities in optimal range", fontsize = 10) 
+plt.text(0.375 * step, 0.9 * upper_hum_range_limit, str(float(n_optimal)/float(len(humidities)) * 100) + "% of humidities in optimal range", fontsize = 10) 
 hum.show()
-        
+
+# These denote the lower and upper bounds for the temperature graph.
+lower_temp_range_limit = 0
+upper_temp_range_limit = 50
+
 temp = plt.figure(2)
 plt.title("Temperatures at Various Times")
 plt.xlabel("Date and Time")
 plt.ylabel("Temperature (C)")
-plt.ylim([0, 50])
+plt.ylim([lower_temp_range_limit, upper_temp_range_limit])
 plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
 plt.plot(index, temps, marker = "+", c = "g")
 temp.show()

@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+'''--------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
+
 def plotting_from_outside_macro(file1, file2):
     
     # These lists will adopt the appropriate values from our data files.
@@ -114,12 +118,16 @@ def plotting_from_outside_macro(file1, file2):
     ax1.plot(index, humidities, marker = "+", c = "g", label = "Assembly Room")
     ax1.plot(weather_data_points, weather_data_hums, marker = "+", c = "r", label = "Charlottesville")
     ax2.plot(precip_points, weather_data_precips, marker = "o", c = "b")
+
+    # These denote the lower and upper bounds for the humidity graph.
+    lower_hum_range_limit = 0
+    upper_hum_range_limit = 100
     
     ax1.set_xlabel("Date and Time")
     ax1.set_ylabel("Relative Humidity (%)", color = "g")
     ax1.tick_params(axis = "x", labelsize = 8)
     ax1.tick_params(axis = "y", labelcolor = "r")
-    ax1.set_ylim([0, 100])
+    ax1.set_ylim([lower_hum_range_limit, upper_hum_range_limit])
     ax2.set_ylabel("Precipitation (mm/3hr)", color = "b")
     ax2.tick_params(axis = "y", labelcolor = "b")
     ax2.set_ylim([0, None])
@@ -144,12 +152,16 @@ def plotting_from_outside_macro(file1, file2):
             continue
     print("Percent of humidities in optimal range:", float(n_optimal)/float(len(humidities)) * 100)
 
+    # These denote the lower and upper bounds for the temperature graph.
+    lower_temp_range_limit = 0
+    upper_temp_range_limit = 50
+
     # This section of code plots the temperatures.
     temp = plt.figure(2)
     plt.title("Temperatures at Various Times")
     plt.xlabel("Date and Time")
     plt.ylabel("Temperature (C)")
-    plt.ylim([0, 50])
+    plt.ylim([lower_temp_range_limit, upper_temp_range_limit])
     plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
     plt.plot(index, temps, marker = "+", c = "g", label = "Assembly Room")
     plt.plot(weather_data_points, weather_data_temps, marker = "+", c = "r", label = "Charlottesville")
@@ -158,6 +170,10 @@ def plotting_from_outside_macro(file1, file2):
     
     # This command is necessary for showing the plots separately, for some reason.
     input()
+
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
 
 def plotting_from_command_line(file1, file2):
 
@@ -205,7 +221,7 @@ def plotting_from_command_line(file1, file2):
         temps.append(lines[4])
         
     for i in range(len(index) - 1):
-        if int(index[i + 1]) < int(index[i]):
+        if int(index[i + 1]) <= int(index[i]):
             index[i + 1] = int(index[i]) + 1
         else:
             continue
@@ -242,11 +258,15 @@ def plotting_from_command_line(file1, file2):
     ax1.plot(weather_data_points, weather_data_hums, marker = "+", c = "r", label = "Charlottesville")
     ax2.plot(precip_points, weather_data_precips, marker = "o", c = "b")
     
+    # These denote the lower and upper bounds for the humidity graph.
+    lower_hum_range_limit = 0
+    upper_hum_range_limit = 100
+
     ax1.set_xlabel("Date and Time")
     ax1.set_ylabel("Relative Humidity (%)", color = "g")
     ax1.tick_params(axis = "x", labelsize = 8)
     ax1.tick_params(axis = "y", labelcolor = "r")
-    ax1.set_ylim([0, 100])
+    ax1.set_ylim([lower_hum_range_limit, upper_hum_range_limit])
     ax2.set_ylabel("Precipitation (mm/3hr)", color = "b")
     ax2.tick_params(axis = "y", labelcolor = "b")
     ax2.set_ylim([0, None])
@@ -268,11 +288,15 @@ def plotting_from_command_line(file1, file2):
             continue
     print("Percent of humidities in optimal range:", float(n_optimal)/float(len(humidities)) * 100)
 
+    # These denote the lower and upper bounds for the temperature graph.
+    lower_temp_range_limit = 0
+    upper_temp_range_limit = 50
+
     temp = plt.figure(2)
     plt.title("Temperatures at Various Times")
     plt.xlabel("Date and Time")
     plt.ylabel("Temperature (C)")
-    plt.ylim([0, 50])
+    plt.ylim([lower_temp_range_limit, upper_temp_range_limit])
     plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
     plt.plot(index, temps, marker = "+", c = "g", label = "Assembly Room")
     plt.plot(weather_data_points, weather_data_temps, marker = "+", c = "r", label = "Charlottesville")
@@ -281,12 +305,20 @@ def plotting_from_command_line(file1, file2):
     
     input()
 
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+
 # This function is necessary for distinguishing between plotting from sensorData.py and from using the command line.
 def number(num1, num2, file1, file2):
     if ((num1 == 1) and (num2 == 1)):
         plotting_from_outside_macro(file1, file2)
     else:
         plotting_from_command_line(file1, file2)
+
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------------------------------------------------------------------------'''
 
 # This checks to see if I'm plotting from sensorData.py or the command line.
 if (len(sys.argv) > 4):
