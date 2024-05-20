@@ -224,5 +224,3 @@ if __name__ == '__main__':
 
 
 # Code written by Christian Guinto-Brody for Professor Chris Neu's research group.
-
-# Test line
