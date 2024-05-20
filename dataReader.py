@@ -171,9 +171,9 @@ def plotting_from_outside_macro(file1, file2):
     # This command is necessary for showing the plots separately, for some reason.
     input()
 
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
 
 def plotting_from_command_line(file1, file2):
 
@@ -305,9 +305,9 @@ def plotting_from_command_line(file1, file2):
     
     input()
 
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
 
 # This function is necessary for distinguishing between plotting from sensorData.py and from using the command line.
 def number(num1, num2, file1, file2):
@@ -316,9 +316,9 @@ def number(num1, num2, file1, file2):
     else:
         plotting_from_command_line(file1, file2)
 
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
-'''--------------------------------------------------------------------------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
+'''--------------------------------------------------------------------------'''
 
 # This checks to see if I'm plotting from sensorData.py or the command line.
 if (len(sys.argv) > 4):
@@ -330,225 +330,3 @@ else:
 
 
 # Code written by Christian Guinto-Brody for Professor Chris Neu's research group.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''-----------------------------------------------------------'''
-''' Like in sensorData.py, the code from here on are ideas I was testing. '''
-
-
-
-
-
-
-
-# x = [dt.datetime.strptime(d, '%Y-%m-%d').date() for d in dates]
-
-# plt.ylimit(0, 100)
-# plt.gca().xaxis.set_major_formatter(dates.DateFormatter('%Y-%m-%d'))
-# plt.gca().xaxis.set_major_locator(dates.DayLocator())
-# plt.plot_date(timestamps, humidities, marker = "o", c = "g", linestyle = "solid")
-
-
-
-
-''' comparison_temps = []
-comparison_hums = []
-m = 0
-k = 0
-while k < len(weather_data_times):
-    print(m, k)
-    if times[m] != weather_data_times[k]:
-        comparison_temps.append(0)
-        comparison_hums.append(0)
-    else:
-        if weather_data_times[k] != "NaN":
-            comparison_temps.append(0)
-            comparison_hums.append(0)
-        else:
-            comparison_temps.append(weather_data_temps[k])
-            comparison_hums.append(weather_data_hums[k])
-
-    k += 1
-    m += int(len(index)/len(weather_data_times))
-
-print(len(comparison_temps), len(comparison_hums))
-'''
-'''
-for m in range(len(index)):
-    print(m)
-    for k in range(len(weather_data_times)):
-        if times[m] != weather_data_times[k]:
-            comparison_temps.append(0)
-            comparison_hums.append(0)
-        else:
-            if weather_data_times[k] != "NaN":
-                comparison_temps.append(0)
-                comparison_hums.append(0)
-            else:
-                comparison_temps.append(weather_data_temps[k])
-                comparison_hums.append(weather_data_hums[k])
-'''
-
-
-
-''' This code specifically was how I originally plotted the humidities
-before adding the third axis for precipitation. '''
-
-'''
-hum = plt.figure(1)
-plt.title("Humidities at Various Times")
-plt.xlabel("Date and Time")
-plt.ylabel("Relative Humidity (%)")
-plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
-plt.plot(index, humidities, marker = "o", c = "g")
-# plt.plot(index, pred_humidity, marker = "o", c = "r")
-plt.plot(weather_data_points, weather_data_hums, marker = "o", c = "r")
-plt.plot(precip_points, precips, marker = "o", c = "b")
-hum.show()
-'''
-
-
-
-
-
-
-'''
-num = 0
-pred_humidity = []
-while num < len(index):
-    A = 17.625
-    B = 243.04
-    C = (A * float(temps[num])) / (B + float(temps[num]))
-    L = 2.45 * 10**6
-    R = 461.5
-    D = L / R
-    K = 273.15
-    T = float(temps[num]) + K
-    a = (T / D) * (K - B)
-    b = (B - ((B * T * C) / D) - K - ((K * A * T) / D) + ((K * T * C) / D)+ T)
-    c = ((B * C) + (K * A) - (K * C) - (A * T) + (T * C))
-    
-    pred_humidity.append(100 * np.exp((-b + np.sqrt((b * b) - (4 * a * c))) / (2 * a)))
-    # print((-b + np.sqrt((b * b) - (4 * a * c))) / (2 * a))
-    # print(a, b, c)
-    # print(b, 2 * a, np.sqrt((b * b) - (4 * a * c)))
-    # print(pred_humidity[num])
-    num += 1
-'''
-
-
-
-
-'''
-import pandas as pd
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-
-data = ''
-delay = 800
-
-options = webdriver.ChromeOptions()
-options.add_experimental_option('useAutomationExtension', False)
-driver = webdriver.Chrome(options=options, executable_path="/home/aang/BTL_humidity_code/chromedriver")
-driver.set_page_load_timeout(1000)
-url = 'http://www.mfinante.gov.ro/patrims.html?adbAdbId=30'
-driver.get(url)
-
-try:
-    myElem = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, 'patrims')))
-    print("Page is ready!")
-
-except TimeoutException:
-        print("Loading took too much time!")
-
-rows = driver.find_elements_by_xpath("//table[@id='patrims']/tbody/tr")
-print(len(rows))
-
-listofdicts = []
-
-def builder(outputlist, inputlist):
-    #i =0
-    for row in inputlist:
-        #i+=1
-        #print(i)
-        soup = BeautifulSoup(row.get_attribute('innerHTML')  , 'html.parser')
-        td= soup.find_all('td')
-        d = {   "Legend" : soup.find("legend").get_text().strip(),
-                "Localitatea" : td[2].get_text().strip(),
-                "Strada" : td[4].get_text().strip(),
-                "Descriere Tehnica" : td[6].get_text().strip(),
-                "Cod de identificare" : td[-7].get_text().strip(),
-                "Anul dobandirii sau darii in folosinta " : td[-6].get_text().strip(),
-                "Valoare" : td[-5].get_text().strip(),
-                "Situatie juridica" : td[-4].get_text().strip(),
-                "Situatie juridica actuala" : td[-3].get_text().strip(),
-                "Tip bun" : td[-2].get_text().strip(),
-                "Stare bun" : td[-1].get_text().strip(),
-            }
-        outputlist.append(d)
-    print('done!')
-
-builder(listofdicts, rows)
-
-print('writing result')
-frame = pd.DataFrame(listofdicts)
-
-# import urllib.request
-# from pprint import pprint
-# from html_table_parser.parser import HTMLTableParser
-# import pandas as pd
-'''
-
