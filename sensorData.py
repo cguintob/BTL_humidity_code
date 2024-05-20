@@ -152,7 +152,6 @@ def readserial(comport, baudrate, timestamp = False):
                     else:
                         raise ValueError
                 except ValueError:
-
                     # This writes everything except the temperature to the data file.
                     if (counter % 2 == 0):
                         data_file = open(file1, "a")
