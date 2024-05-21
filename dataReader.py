@@ -120,8 +120,8 @@ def plotting_from_outside_macro(file1, file2):
     ax2.plot(precip_points, weather_data_precips, marker = "o", c = "b")
 
     # These denote the lower and upper bounds for the humidity graph.
-    lower_hum_range_limit = 30
-    upper_hum_range_limit = 70
+    lower_hum_range_limit = 45
+    upper_hum_range_limit = 55
     
     ax1.set_xlabel("Date and Time")
     ax1.set_ylabel("Relative Humidity (%)", color = "g")
@@ -139,7 +139,7 @@ def plotting_from_outside_macro(file1, file2):
     # These lines show the optimal range of humidities.
     ax1.plot([0, len(index)], [40, 40], c = "y", linewidth = 3.0)
     ax1.plot([0, len(index)], [60, 60], c = "y", linewidth = 3.0, label = "Optimal Range")
-    ax1.legend(loc = "upper right")
+    ax1.legend(loc = "best")
     hum.show()
     
     ''' This section of code finds and displays the percent of 
@@ -165,7 +165,7 @@ def plotting_from_outside_macro(file1, file2):
     plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
     plt.plot(index, temps, marker = "+", c = "g", label = "Assembly Room")
     plt.plot(weather_data_points, weather_data_temps, marker = "+", c = "r", label = "Charlottesville")
-    plt.legend(loc = "upper right")
+    plt.legend(loc = "best")
     temp.show()
     
     # This command is necessary for showing the plots separately, for some reason.
@@ -259,8 +259,8 @@ def plotting_from_command_line(file1, file2):
     ax2.plot(precip_points, weather_data_precips, marker = "o", c = "b")
     
     # These denote the lower and upper bounds for the humidity graph.
-    lower_hum_range_limit = 30
-    upper_hum_range_limit = 70
+    lower_hum_range_limit = 45
+    upper_hum_range_limit = 55
 
     ax1.set_xlabel("Date and Time")
     ax1.set_ylabel("Relative Humidity (%)", color = "g")
@@ -277,7 +277,7 @@ def plotting_from_command_line(file1, file2):
     
     ax1.plot([0, len(index)], [40, 40], c = "y", linewidth = 3.0)
     ax1.plot([0, len(index)], [60, 60], c = "y", linewidth = 3.0, label = "Optimal Range")
-    ax1.legend(loc = "upper right")
+    ax1.legend(loc = "best")
     hum.show()
     
     n_optimal = 0
@@ -300,7 +300,7 @@ def plotting_from_command_line(file1, file2):
     plt.xticks(np.arange(len(index), step = len(index) / n_desired_ticks), indexed_times, fontsize = 8, rotation = 45)
     plt.plot(index, temps, marker = "+", c = "g", label = "Assembly Room")
     plt.plot(weather_data_points, weather_data_temps, marker = "+", c = "r", label = "Charlottesville")
-    plt.legend(loc = "upper right")
+    plt.legend(loc = "best")
     temp.show()
     
     input()
