@@ -120,8 +120,8 @@ def plotting_from_outside_macro(file1, file2):
     ax2.plot(precip_points, weather_data_precips, marker = "o", c = "b")
 
     # These denote the lower and upper bounds for the humidity graph.
-    lower_hum_range_limit = 0
-    upper_hum_range_limit = 100
+    lower_hum_range_limit = 30
+    upper_hum_range_limit = 70
     
     ax1.set_xlabel("Date and Time")
     ax1.set_ylabel("Relative Humidity (%)", color = "g")
@@ -150,7 +150,7 @@ def plotting_from_outside_macro(file1, file2):
             n_optimal += 1
         else:
             continue
-    print("Percent of humidities in optimal range:", float(n_optimal)/float(len(humidities)) * 100)
+    print("Percent of humidities in optimal range: " + str(float(n_optimal)/float(len(humidities)) * 100) + "%")
 
     # These denote the lower and upper bounds for the temperature graph.
     lower_temp_range_limit = 0
@@ -259,8 +259,8 @@ def plotting_from_command_line(file1, file2):
     ax2.plot(precip_points, weather_data_precips, marker = "o", c = "b")
     
     # These denote the lower and upper bounds for the humidity graph.
-    lower_hum_range_limit = 0
-    upper_hum_range_limit = 100
+    lower_hum_range_limit = 30
+    upper_hum_range_limit = 70
 
     ax1.set_xlabel("Date and Time")
     ax1.set_ylabel("Relative Humidity (%)", color = "g")
@@ -286,7 +286,7 @@ def plotting_from_command_line(file1, file2):
             n_optimal += 1
         else:
             continue
-    print("Percent of humidities in optimal range:", float(n_optimal)/float(len(humidities)) * 100)
+    print("Percent of humidities in optimal range: " + str(float(n_optimal)/float(len(humidities)) * 100) + "%")
 
     # These denote the lower and upper bounds for the temperature graph.
     lower_temp_range_limit = 0
