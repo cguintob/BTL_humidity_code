@@ -196,6 +196,14 @@ change permissions. This command works if you are not a root user at the moment,
  and it will ask you to enter your sudo password. If you are a root user at the 
 moment, omit `sudo` from the command.
 
+You can change the read (r), write (w) and execute (x) permissions on a file by
+using the following command:
+
+`sudo chmod +(-)r(w)(x) [FILE(DIRECTORY)]`
+
+You can add "+" (or remove "-") any combination of r, w, and x on a file or
+directory. If you're already acting as a root user, you can omit `sudo`.
+
 ### Humidity and Temperature Values Switch
 Sometimes, when executing `sensorData.py`, the timing gets off with the sensor 
 and the values that are listed as humidities are actually temperatures and vice 
@@ -221,7 +229,7 @@ execute the following command:
 
 `git reset --soft origin/[BRANCH NAME]`
 
-You can determine the branch name by running `git branch --show-current`.\
+You can determine the branch name by running `git branch --show-current`.
 
 ### Merging Data into One File
 To merge different datasets into one file, simply use the following command:
