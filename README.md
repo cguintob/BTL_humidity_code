@@ -27,6 +27,8 @@ separate data file
 `dataReader.py` --- Reads data from files and plots it  
 `otherDataReader.py` --- Used like `dataReader.py` but without weather data from
 Charlottesville  
+`NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
+arbitrary number of data files (in a new format) in any order
 `sensorData.py~` `dataReader.py~` `otherDataReader.py~` --- Backup versions of 
 each script
 
@@ -40,6 +42,8 @@ shows example of data format
 for plotting)  
 `Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project 
 that contains above plots
+`testing30.txt` `testing31.txt` `testing32.txt` --- Data files taken between
+5/23/2024 at 7:30 pm to 5/24/2024 at 11:54 pm in the new format
 
 ### Miscellaneous/Housekeeping
 `README.md` --- Contains information about project and how to use programs  
@@ -109,6 +113,11 @@ After the program is run, it will print whatever is sent to the serial port by
 measurement and an index used for plotting, are then written to the first data 
 file (they're actually appended so no data is lost).
 
+5/24/2024 UPDATE: Instead of plotting an index, `sensorData.py` now plots the 
+serial port number in the first column. This is useful for using `NEW_READER.py`
+but doesn't affect the function of `dataReader.py`, since the latter corrects 
+any discrepancies in the indexes present in the data files.
+
 The unique features of this program are its use of `requests` and `keyboard`, 
 two Python libraries that allow the program to fetch information from websites 
 and allow the user keyboard functionality when operating the program. 
@@ -134,8 +143,14 @@ the program should be freely usable.
 
 
 ## USING `dataReader.py` and `otherDataReader.py`
+NOTE: These scripts have neen "upgraded" to a new script using pandas. They are 
+still useful, but not in the same way as the new script.
+
 After the user hits the ALT button, `sensorData.py` will pass the two data files
- to which it was writing to `dataReader.py`, which will then plot them. 
+ to which it was writing to `dataReader.py`, which will then plot them.
+
+5/24/2024 UPDATE: The above feature has been commented out. It remains available
+ if necessary. 
 
 `dataReader.py` contains a special function called `number`, which takes two 
 data files and two extra value as inputs. When used with `sensorData.py`, 
@@ -160,6 +175,26 @@ This program takes only one file *for sensor measurements*. It is not to be used
  with WTTR data.
 
 
+## USING `NEW_READER.py`
+This new program takes an arbitrary number of data files in any order and plots 
+them all on graphs similar to those in `dataReader.py`. It is used as follows:
+
+`python NEW_READER.py [DATA FILE 1].txt [DATA FILE 2].txt [DATA FILE 3].txt ...`
+
+The reasons it takes an arbitrary number of files are:
+1. There are multiple sensors running at the same time.
+2. There is data from multiple time periods.
+
+`NEW_READER.py` can plot data from just one sensor, multiple sensors, just one
+ file of weather data, or multple sensors with a file of weather data, across 
+differing time periods for each. The files can be passed in any order to 
+prevent mistakes in plotting.
+
+NOTE: Multiple weather data files can be passed *if they are not on the same 
+time interval*. Just make sure you know which files include weather data 
+and which don't.
+
+
 ## SUMMARY
 The following commands, in order, are how to run and plot the data from the 
 sensor:
@@ -176,6 +211,11 @@ If there is already data available, use this command (can be run as a root user
 If the user wishes not to plot Charlottesville weather data, use this command:
 
 `python otherDataReader.py [DATA FILE].txt`
+
+### UPDATE AS OF 5/24/2024
+To plot the data, using the following command:
+
+`python NEW_READER.py [DATA FILE 1].txt [DATA FILE 2].txt [DATA FILE 3].txt ...`
 
 
 ## TROUBLESHOOTING
@@ -237,3 +277,10 @@ To merge different datasets into one file, simply use the following command:
 `cat [DATA FILE 1].txt [DATA FILE 2].txt ... > [MERGED DATA FILE].txt`
 
 This is useful when using `otherDataReader.py`.
+
+### `NEW_READER` gives a shaded area instead of a line
+This is a result of using multiple weather data files along the same time 
+period. Use only one.
+
+### `NEW_READER.py` taking a long time to load
+Just be patient. It's working, I promise.
