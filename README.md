@@ -28,7 +28,7 @@ separate data file
 `otherDataReader.py` --- Used like `dataReader.py` but without weather data from
 Charlottesville  
 `NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
-arbitrary number of data files (in a new format) in any order
+arbitrary number of data files (in a new format) in any order 
 `sensorData.py~` `dataReader.py~` `otherDataReader.py~` --- Backup versions of 
 each script
 
