@@ -74,7 +74,6 @@ for f in files:
 ''' ================================================ PART 3: ORDERING ================================================ '''
 ''' ================================================================================================================== '''
 
-
 ''' This part of the code simply defines an OrderedDict, which is a special kind
  of dictionary that retains the order in which key-value pairs are inserted into
  the dictionary. I take the items inside my unsorted dictionary and sort them. 
@@ -92,7 +91,6 @@ keys = list(sorted_df.keys())
 ''' ================================================================================================================== '''
 ''' ============================================== PART 4: MORE SORTING ============================================== '''
 ''' ================================================================================================================== '''
-
 
 ''' This part of the code defines the index (i.e. the x-axis) for plotting. The 
 data I collect contains two separate columns for the date and time (nicely named
@@ -134,7 +132,6 @@ date_list = pd.date_range(start_date, end_date, freq = "s")
 ''' ============================================= PART 5: DEFINING BOUNDS ============================================ '''
 ''' ================================================================================================================== '''
 
-
 ''' These next objects are simply simple ways to store the various bounds for 
 the plots. It makes life easier when they are all 1) defined) and 2) put in 
 the same place. The only bounds not included here is for the lower and upper 
@@ -158,7 +155,6 @@ markers = ["x", ".", ",", "v", "^"]
 ''' ================================================================================================================== '''
 ''' =========================================== PART 6: PLOTTING HUMIDITIES ========================================== '''
 ''' ================================================================================================================== '''
-
 
 ''' This section of code plots the humidities from each sensor and wttr. To do 
 this, I first define the plot itself and an axis as subplots of each other. The 
@@ -226,7 +222,6 @@ hums.show()
 ''' ================================================================================================================== '''
 ''' ========================================== PART 7: PLOTTING TEMPERATURES ========================================= '''
 ''' ================================================================================================================== '''
-
 
 ''' This section is analogous to Part 6, but for temperatures. The key 
 differences here are that 1) I don't need to define a separate axis for 
