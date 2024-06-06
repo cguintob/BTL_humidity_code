@@ -4,7 +4,6 @@ from datetime import date # Module in "datetime" that specifically accesses the 
 import sys                # Allows the user to use command line arguments
 import requests           # Allows the user to get information from a url
 import keyboard           # Allows for keyboard functionality
-# import dataReader         # Macro for plotting data
 
 ''' ================================================================================================================== '''
 ''' ==================================================== OVERVIEW ==================================================== '''
@@ -135,7 +134,6 @@ def readserial(comport, baudrate, timestamp = False):
     ''' These counters are used to determine what parameters 
     the values represent. '''
     counter = 0
-    # count_for_wttr = 0
 
     ''' This variable is used to correct the switching of the
     humidity and temperature from the Arduino. It predominantly
@@ -162,7 +160,6 @@ def readserial(comport, baudrate, timestamp = False):
         # This is only run if we're collecting a set number of measurements.
         elif (data == "Done!"):
             print(data)
-            # dataReader.number(1, 1, file1, file2)
             sys.exit(1)
             
         # This actually puts the data into a data file.
@@ -196,7 +193,6 @@ def readserial(comport, baudrate, timestamp = False):
                     if (counter % 2 == 0):
                         data_file = open(file1, "a")
                         data_file.write(str(port_num))
-                        # data_file.write(str(int(0.5 * counter)))
                         data_file.write(" ")
                         data_file.write(str(day))
                         data_file.write(" ")
@@ -219,7 +215,6 @@ def readserial(comport, baudrate, timestamp = False):
                         I put it under this else statement. '''
                         weather_data = open(file2, "a")
                         weather_data.write(str(port_num))
-                        # weather_data.write(str(count_for_wttr))
                         weather_data.write(" ")
                         weather_data.write(str(day))
                         weather_data.write(" ")
@@ -235,12 +230,10 @@ def readserial(comport, baudrate, timestamp = False):
                             continue
                         weather_data.write("\n")
                         weather_data.close()
-                        # count_for_wttr += 1
                     
                     counter += 1
             
     print("Done!")
-    # dataReader.number(1, 1, file1, file2)
     sys.exit(1)
             
 ''' It's important to note that I open and close the data file each time I add a

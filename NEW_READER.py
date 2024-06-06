@@ -20,17 +20,22 @@ can plot solely using the timestamp. '''
 
 ''' This defines the files from command-line arguments in an efficient way: for
 each system argument, if the argument is a txt file, add it to the list "files";
-otherwise, tell the user that they should send the program txt files and exit. ''' 
+otherwise, tell the user that they should send the program txt files and exit. 
+If no files are given, the program will exit and tell the user its usage. ''' 
 
 ''' ================================================================================================================== '''
 
 files = []
-for i in range(1, len(sys.argv)):        # I defined the range this way so that the i in the for loop and the i index for the system arguments matched.
-    if (sys.argv[i].endswith(".txt")):
-        files.append(sys.argv[i])
-    else:
-        print("Use the following format: python NEW_READER.py [datafile1].txt [datafile2].txt [datafile3].txt ...\n")
-        sys.exit(1)
+if (len(sys.argv) != 1):
+    for i in range(1, len(sys.argv)):        # I defined the range this way so that the i in the for loop and the i index for the system arguments matched.
+        if (sys.argv[i].endswith(".txt")):
+            files.append(sys.argv[i])
+        else:
+            print("Use the following format: python NEW_READER.py [datafile1].txt [datafile2].txt [datafile3].txt ...\n")
+            sys.exit(1)
+else:
+    print("Use the following format: python NEW_READER.py [datafile1].txt [datafile2].txt [datafile3].txt ...\n")
+    sys.exit(1)
 
 ''' ================================================================================================================== '''
 ''' ================================================ PART 2: DATAFRAMES ============================================== '''
@@ -123,6 +128,8 @@ for i in range(len(keys)):
     sorted_df[keys[i]].drop("Time", axis = 1, inplace = True)
     sorted_df[keys[i]].sort_values(by = "Date and Time", inplace = True)
     sorted_df[keys[i]].set_index(["Date and Time"], inplace = True)
+    
+    sorted_df[keys[i]].dropna(inplace = True)   # This corrects for any missing values (i.e. removes any row where a NaN appears).
 
 start_date = sorted_df[keys[0]].index.tolist()[0]
 end_date = sorted_df[keys[len(keys) - 1]].index.tolist()[len(sorted_df[keys[len(keys) - 1]].index.tolist()) - 1]
@@ -151,6 +158,14 @@ upper_hum_bound = 55
 n_desired_ticks = 10
 colors = ["cyan", "green", "yellow", "magenta"]
 markers = ["x", ".", ",", "v", "^"]
+
+# These two variables are for naming the plots. They'll appear in Parts 6 and 7.
+title_start_date = str(date_list[lower_time_bound])[:10] + ", " + str(date_list[lower_time_bound])[(10 + 1):]
+title_end_date = str(date_list[upper_time_bound])[:10] + ", " + str(date_list[upper_time_bound])[(10 + 1):]
+
+# These two variables are for naming the saved figures. They'll also appear in Parts 6 and 7.
+png_start_date = str(date_list[lower_time_bound])[:10] + "---" + str(date_list[lower_time_bound])[(10 + 1):]
+png_end_date = str(date_list[upper_time_bound])[:10] + "---" + str(date_list[upper_time_bound])[(10 + 1):]
 
 ''' ================================================================================================================== '''
 ''' =========================================== PART 6: PLOTTING HUMIDITIES ========================================== '''
@@ -214,9 +229,10 @@ ax_hum.set_ylabel("Relative Humidity (%)", color = "k")
 ax_hum.tick_params(axis = "y", labelcolor = "k")
 ax_hum.set_ylim([lower_hum_bound, upper_hum_bound])    
 plt.xlim(date_list[lower_time_bound], date_list[upper_time_bound])
-plt.title("Humidities at Various Times")
-ax_hum.legend(loc = "best", prop = {"size": 10})                                                         # Location of legend is where it is deemed best based on the data
+plt.title("Humidities from {0} to {1}".format(title_start_date, title_end_date))
+ax_hum.legend(loc = "best", prop = {"size": 10})                                                         # Location of legend based on the data
 hums.autofmt_xdate(ha = "right")                                                                         # Flush of the x-ticks
+hums.savefig("data_graphs/hums_{0}_{1}.png".format(png_start_date, png_end_date))                        # Saves plot to PNG
 hums.show()
 
 ''' ================================================================================================================== '''
@@ -259,9 +275,10 @@ ax_temp.set_ylabel("Temperature (C)", color = "k")
 ax_temp.tick_params(axis = "y", labelcolor = "k")
 ax_temp.set_ylim([lower_temp_bound, upper_temp_bound])    
 plt.xlim(date_list[lower_time_bound], date_list[upper_time_bound])
-plt.title("Temperatures at Various Times")
+plt.title("Temperatures from {0} to {1}".format(title_start_date, title_end_date))
 ax_temp.legend(loc = "best", prop = {"size": 10})
 temps.autofmt_xdate(ha = "right")
+temps.savefig("data_graphs/temps_{0}_{1}.png".format(png_start_date, png_end_date))
 temps.show()
 
 ''' ================================================================================================================== '''
