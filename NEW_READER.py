@@ -32,9 +32,11 @@ if (len(sys.argv) != 1):
             files.append(sys.argv[i])
         else:
             print("Use the following format: python NEW_READER.py [datafile1].txt [datafile2].txt [datafile3].txt ...\n")
+            print("Can also be used like this: python NEW_READER.py path_to_datafiles/[filename]*")
             sys.exit(1)
 else:
     print("Use the following format: python NEW_READER.py [datafile1].txt [datafile2].txt [datafile3].txt ...\n")
+    print("Can also be used like this: python NEW_READER.py path_to_datafiles/[filename]*")
     sys.exit(1)
 
 ''' ================================================================================================================== '''
@@ -202,8 +204,7 @@ I define things using "plt." '''
 
 ''' ================================================================================================================== '''
 
-hums, ax_hum = plt.subplots()
-hums = plt.figure(1)
+hums = plt.subplot(211)
 for i in range(len(keys)):
     if (len(sorted_df[keys[i]].columns) < 4):
         color = colors[i]
@@ -229,11 +230,7 @@ ax_hum.set_ylabel("Relative Humidity (%)", color = "k")
 ax_hum.tick_params(axis = "y", labelcolor = "k")
 ax_hum.set_ylim([lower_hum_bound, upper_hum_bound])    
 plt.xlim(date_list[lower_time_bound], date_list[upper_time_bound])
-plt.title("Humidities from {0} to {1}".format(title_start_date, title_end_date))
-ax_hum.legend(loc = "best", prop = {"size": 10})                                                         # Location of legend based on the data
-hums.autofmt_xdate(ha = "right")                                                                         # Flush of the x-ticks
-hums.savefig("data_graphs/hums_{0}_{1}.png".format(png_start_date, png_end_date))                        # Saves plot to PNG
-hums.show()
+plt.title("Humidities from {0} to {1}".format(title_start_date, title_end_date), fontsize = 10)
 
 ''' ================================================================================================================== '''
 ''' ========================================== PART 7: PLOTTING TEMPERATURES ========================================= '''
@@ -251,8 +248,7 @@ in degrees Fahrenheit. To do the latter, I apply a "lambda" modification to each
 lower_temp_bound = 0
 upper_temp_bound = 30
 
-temps, ax_temp = plt.subplots()
-temps = plt.figure(2)
+temps = plt.subplot(212)
 for i in range(len(keys)):
     if (len(sorted_df[keys[i]].columns) < 4):
         color = colors[i]
@@ -275,22 +271,29 @@ ax_temp.set_ylabel("Temperature (C)", color = "k")
 ax_temp.tick_params(axis = "y", labelcolor = "k")
 ax_temp.set_ylim([lower_temp_bound, upper_temp_bound])    
 plt.xlim(date_list[lower_time_bound], date_list[upper_time_bound])
-plt.title("Temperatures from {0} to {1}".format(title_start_date, title_end_date))
-ax_temp.legend(loc = "best", prop = {"size": 10})
-temps.autofmt_xdate(ha = "right")
-temps.savefig("data_graphs/temps_{0}_{1}.png".format(png_start_date, png_end_date))
-temps.show()
+plt.title("Temperatures from {0} to {1}".format(title_start_date, title_end_date), fontsize = 10)
+ax_temp.legend(loc = "best", prop = {"size": 10})                                                   # Location of the legend based on data
 
 ''' ================================================================================================================== '''
 ''' ============================================ PART 8: DISPLAYING PLOTS ============================================ '''
 ''' ================================================================================================================== '''
 
-''' This section is one function that waits for user input before getting rid of
- the plots from the screen. '''
+''' This section is used for continuously updating the plots with the updating 
+code. If the script is used by itself, it simply holds the graph for 60 seconds 
+and then gets rid of it. If the script is used in interactive_plotter.py, then 
+the graph will be replotted. '''
 
 ''' ================================================================================================================== '''
 
-input()
+try:
+    plt.ion()
+    plt.show()
+    plt.pause(60)
+    plt.close()
+except KeyboardInterrupt:
+    plt.savefig("data_graphs/{0}_to_{1}.png".format(png_start_date, png_end_date))
+    print("Done!")
+    sys.exit(1)
 
 ''' ================================================================================================================== '''
 ''' ============================================ PART 9: ACKNOWLEDGEMENTS ============================================ '''
