@@ -223,7 +223,7 @@ hums.show()
 ''' ========================================== PART 7: PLOTTING TEMPERATURES ========================================= '''
 ''' ================================================================================================================== '''
 
-''' This section is analogous to Part 6, but for temperatures. The key 
+''' This section is analogous to Parts 5 and 6, but for temperatures. The key 
 differences here are that 1) I don't need to define a separate axis for 
 precipitation data, since I'm not including that data on the plot, and 2) I must
  convert the wttr temperature data to degrees Celsius since they were collected 
