@@ -29,21 +29,26 @@ separate data file
 Charlottesville  
 `NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
 arbitrary number of data files (in a new format) in any order  
+`interactive_plotter.py` --- A script that continuously calls `NEW_READER.py` 
+and can display updating plots with updating datasets
 `sensorData.py~` `dataReader.py~` `otherDataReader.py~` --- Backup versions of 
 each script
 
 ### Data Files, Plots, and Other Results
 `merged_data.txt` --- Contains all data taken since the start of the project; 
-shows example of data format  
+shows example of data in the old format  
 `all_humidities_until_5-2.png` `all_temperatures_until_5-2.png` --- Plots of all
  data (used `merged_data.txt` for data and `otherDataReader.py` for plotting)  
 `humidities_apr-30_may-2.png` `temperatures_apr-30_may-2.png` --- Plots of local
  and Charlottesville data between 4/30/2024 and 5/2/2024 (used `dataReader.py` 
-for plotting)  
+for plotting)
+`EXAMPLE_hums_graph.png` `EXAMPLE_temps_graph.png` --- Example graphs in the 
+new format 
 `Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project 
 that contains above plots
-`testing30.txt` `testing31.txt` `testing32.txt` --- Data files taken between
-5/23/2024 at 7:30 pm to 5/24/2024 at 11:54 pm in the new format
+`EXAMPLE_sensor_0.txt` `EXAMPLE_weather.txt` `EXAMPLE_sensor_1.txt` --- Data 
+files taken between 5/24/2024 at 3:23.47 pm and 5/26/2024 at 1:28:29 am in 
+the new format
 
 ### Miscellaneous/Housekeeping
 `README.md` --- Contains information about project and how to use programs  
@@ -194,6 +199,7 @@ NOTE: Multiple weather data files can be passed *if they are not on the same
 time interval*. Just make sure you know which files include weather data 
 and which don't.
 
+Conveniently, `interactive_plotter.py` is used the same as `NEW_READER.py`.
 
 ## SUMMARY
 The following commands, in order, are how to run and plot the data from the 
@@ -216,6 +222,20 @@ If the user wishes not to plot Charlottesville weather data, use this command:
 To plot the data, using the following command:
 
 `python NEW_READER.py [DATA FILE 1].txt [DATA FILE 2].txt [DATA FILE 3].txt ...`
+
+or
+
+`python interactive_plotter.py [DATA FILE 1].txt [DATA FILE 2].txt [DATA FILE 3].txt ...`
+
+NOTE: You can also specify a file path to a data file in another directory. And 
+if the files all have a common beginning, you can use the `*` method to use them 
+all with the script. As an example:
+
+`python interactive_plotter.py data_runs/run000001*`
+
+This example assumes you are in the directory where `interative_plotter.py` is 
+located and that the directory `data_runs/` is a subdirectory of your current 
+working directory.
 
 
 ## TROUBLESHOOTING
