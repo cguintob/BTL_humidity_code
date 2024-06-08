@@ -1,0 +1,144 @@
+import matplotlib.pyplot as plt
+import matplotlib.ticker as plticker
+import matplotlib.dates as mdates
+import numpy as np
+import pandas as pd
+import sys
+from collections import OrderedDict
+from datetime import datetime
+import time
+
+def list_print(list):
+    for i in range(len(list)):
+        print(list[i])
+
+''' This macro functions similarly as dataReader.py, but using pandas. This nice
+ thing about pandas is that you can treat data from files as dataframes, which 
+make plotting a lot simpler because you don't need to split the data into lists 
+and loop through them. It's also nice because the index isn't necessary---you 
+can plot solely using the timestamp. '''
+
+files = []
+# This defines the files from command-line arguments in an efficient way.
+for i in range(1, len(sys.argv)):
+    if (sys.argv[i].endswith(".txt")):
+        files.append(sys.argv[i])
+    else:
+        print("Use the following format: python NEW_READER.py [datafile1].txt [datafile2].txt [datafile3].txt ...\n")
+        print("NOTE: One of the datafiles must be weather data; the other files must be from different sensors.")
+        sys.exit(1)
+
+''' This defines the dataframes from the command-line arguments. It allows the 
+user to enter the files in whichever order they choose. '''
+unsorted_df = {}
+for f in files:
+    df = pd.read_csv(f, sep = " ", header = None)
+    if (len(df.columns) > 5):
+        if ("df{0}".format(int(0.5 * (len(sys.argv) - 1))) not in list(unsorted_df.keys())):
+            unsorted_df["df{0}".format(int(0.5 * (len(sys.argv) - 1)))] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])
+        else:
+            unsorted_df["df{0}".format(int(0.5 * (len(sys.argv) - 1)))] = unsorted_df["df{0}".format(int(0.5 * (len(sys.argv) - 1)))].append(pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"]), ignore_index = True)
+    else:
+        if ("df{0}".format(df.iloc[0][0] + 1) not in list(unsorted_df.keys())):
+            unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])
+        else:
+            unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = unsorted_df["df{0}".format(df.iloc[0][0] + 1)].append(pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"]), ignore_index = True)
+
+sorted_df = OrderedDict(sorted(unsorted_df.items()))
+keys = list(sorted_df.keys())
+
+# This sets the index (i.e. the x-axis) for plotting.
+indexed_times = []
+n_desired_ticks = 10
+for i in range(len(keys)):
+    sorted_df[keys[i]]["Time"] = pd.to_datetime(sorted_df[keys[i]]["Time"])
+    sorted_df[keys[i]].rename(columns = {"Time": "Date and Time"}, inplace = True)
+    sorted_df[keys[i]].drop("Date", axis = 1, inplace = True)
+    sorted_df[keys[i]].sort_values(by = "Date and Time", inplace = True)
+    sorted_df[keys[i]].set_index(["Date and Time"], inplace = True)
+    for element in sorted_df[keys[i]].index.tolist():
+        if (element not in indexed_times):
+            indexed_times.append(element)
+        else:
+            continue
+
+'''
+for i in range(len(keys)):
+    print(sorted_df[keys[i]])
+'''
+
+indexed_times = [str(dt) for dt in indexed_times]
+indexed_times = sorted([datetime.strptime(dt, "%Y-%m-%d %H:%M:%S") for dt in indexed_times])
+indexed_times = [time.mktime(dt.timetuple()) for dt in indexed_times]
+indexed_times = [datetime.fromtimestamp(dt).strftime("%Y-%m-%d %H:%M:%S") for dt in indexed_times]
+
+start_date = indexed_times[0]
+end_date = indexed_times[len(indexed_times) - 1]
+date_list = pd.date_range(start_date, end_date, freq = "s")
+
+# print(date_list)
+
+
+colors = ["green", "red", "yellow"]
+lower_time_bound = 1
+upper_time_bound = int(0.5 * len(indexed_times))
+lower_hum_bound = 0
+upper_hum_bound = 100
+lower_temp_bound = 0
+upper_temp_bound = 30
+
+# This plots the humidities.
+hums = plt.figure(1)
+# plt.xticks(np.arange(len(indexed_times), step = int(len(indexed_times) / n_desired_ticks))[:-1], indexed_times)
+for i in range(len(keys)):
+    if (len(sorted_df[keys[i]].columns) < 4):
+        if (i == 0):
+            ax = sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = colors[i], label = "Sensor {0}".format(int(sorted_df[keys[i]]["Port"][0]) + 1))
+            ax.set_xlabel("Date and Time")
+            ax.set_ylabel("Relative Humidity (%)", color = "g")
+            ax.tick_params(axis = "x", labelsize = 8)
+            ax.set_xlim([lower_time_bound, upper_time_bound])
+            ax.tick_params(axis = "y", labelcolor = "r")
+            ax.set_ylim([lower_hum_bound, upper_hum_bound])
+        else:
+            sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = colors[i], label = "Sensor {0}".format(int(sorted_df[keys[i]]["Port"][0]) + 1))
+    else:
+        sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = "magenta", label = "Charlottesville")
+        ax2 = sorted_df[keys[i]]["Precipitation"].plot(rot = 45, secondary_y = True, color = "blue")
+        ax2.set_ylabel("Precipitation (mm/3hr)", color = "b")
+        ax2.tick_params(axis = "y", labelcolor = "b")
+        ax2.set_ylim([0, None])
+
+ax.xaxis.set_major_locator(mdates.SecondLocator(interval = int(len(date_list) / n_desired_ticks)))
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d\n%H:%M:%S"))
+plt.title("Humidities at Various Times")
+ax.legend(loc = "best")
+hums.autofmt_xdate(ha = "right")
+hums.show()
+# hums.savefig("test_plot.png")
+
+# This plots the temperatures.
+temps = plt.figure(2)
+label_counter = 0
+for i in range(len(keys)):
+    if (len(sorted_df[keys[i]].columns) < 4):
+        sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = colors[i], label = "Sensor {0}".format(int(sorted_df[keys[i]]["Port"][0]) + 1))
+    else:
+        sorted_df[keys[i]]["Temperature"] = sorted_df[keys[i]]["Temperature"].apply(lambda x: (int(x) - 32) / 1.8)
+        if (label_counter == 0):
+            sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = "magenta", label = "Charlottesville")
+        else:
+            sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = "magenta")
+
+ax.xaxis.set_major_locator(mdates.SecondLocator(interval = int(len(date_list) / n_desired_ticks)))
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d\n%H:%M:%S"))
+plt.xlabel("Date and Time")
+plt.xlim([lower_time_bound, upper_time_bound])
+plt.ylabel("Temperature (C)")
+plt.ylim([lower_temp_bound, upper_temp_bound])
+plt.title("Temperatures at Various Times")
+plt.legend(loc = "best")
+temps.show()
+# temps.savefig("test_plot_temps.png")
+
+input()
