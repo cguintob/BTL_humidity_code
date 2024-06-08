@@ -29,7 +29,7 @@ separate data file
 Charlottesville  
 `NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
 arbitrary number of data files (in a new format) in any order and can plot 
-updating data
+updating data  
 `sensorData.py~` `dataReader.py~` `otherDataReader.py~` `NEW_READER.py~` --- Backup versions of 
 each script
 
