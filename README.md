@@ -109,9 +109,8 @@ measurement and an index used for plotting, are then written to the first data
 file (they're actually appended so no data is lost).
 
 5/24/2024 UPDATE: Instead of plotting an index, `sensorData.py` now plots the 
-serial port number in the first column. This is useful for using `NEW_READER.py`
-but doesn't affect the function of `dataReader.py`, since the latter corrects 
-any discrepancies in the indexes present in the data files.
+serial port number in the first column. This is useful for using 
+`NEW_READER.py`.
 
 The unique features of this program are its use of `requests` and `keyboard`, 
 two Python libraries that allow the program to fetch information from websites 
