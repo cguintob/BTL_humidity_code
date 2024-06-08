@@ -64,10 +64,24 @@ def precip_axis(axis):
     axis.tick_params(axis = "y", labelcolor = "b")
     axis.set_ylim([0, None])
 
-# This function saves our graphs to the "data_graphs" directory and exits the program.
-def save_and_exit(photo_start, photo_end):
+''' This function defines the bounds and some dates to be used for naming. The 
+first two are the lower and upper time bounds, respectively, used for the x-axis
+ and other things. The second two are the start and end dates and times for the 
+plot titles, respectively. The third two are the start and end dates and times 
+for the photo titles, respectively. They are all returned by the function. '''
+def bounds(low_time, high_time, list_of_dates):
+    lower_bound = int(low_time * (len(list_of_dates) - 1))
+    upper_bound = int(high_time * (len(list_of_dates) - 1))
+    start_for_title = str(list_of_dates[lower_bound])[:10] + ", " + str(list_of_dates[lower_bound])[(10 + 1):]
+    end_for_title = str(list_of_dates[upper_bound])[:10] + ", " + str(list_of_dates[upper_bound])[(10 + 1):]
+    start_for_photo = str(list_of_dates[lower_bound])[:10] + "---" + str(list_of_dates[lower_bound])[(10 + 1):] 
+    end_for_photo = str(list_of_dates[upper_bound])[:10] + "---" + str(list_of_dates[upper_bound])[(10 + 1):]
+    return (lower_bound, upper_bound, start_for_title, end_for_title, start_for_photo, end_for_photo)
+
+# This function saves the figure and closes the program at the end of its functioning.
+def save_exit(photo_start, photo_end):
     plt.savefig("data_graphs/{0}_to_{1}.png".format(photo_start, photo_end))
-    print("Done!")
+    print("Saved to ~/BTL_humidity_code/data_graphs as {0}_to_{1}.png".format(photo_start, photo_end))
     sys.exit(1)
 
 ''' ================================================================================================================== '''
@@ -200,8 +214,6 @@ colors and markers included in matplotlib.pyplot for ease of definition. '''
 
 lower_time_index = 0
 upper_time_index = 1
-lower_time_bound = int(lower_time_index * (len(date_list) - 1))
-upper_time_bound = int(upper_time_index * (len(date_list) - 1))
 lower_hum_bound = 0
 upper_hum_bound = 100
 lower_temp_bound = 0
@@ -211,13 +223,7 @@ n_desired_ticks = 10
 colors = ["cyan", "green", "yellow", "magenta"]
 markers = ["x", ".", ",", "v", "^"]
 
-# These two variables are for naming the plots. They'll appear in Parts 6, 7, and 8.
-title_start_date = str(date_list[lower_time_bound])[:10] + ", " + str(date_list[lower_time_bound])[(10 + 1):]
-title_end_date = str(date_list[upper_time_bound])[:10] + ", " + str(date_list[upper_time_bound])[(10 + 1):]
-
-# These two variables are for naming the saved figures. They'll appear in Part 8.
-png_start_date = str(date_list[lower_time_bound])[:10] + "---" + str(date_list[lower_time_bound])[(10 + 1):]
-png_end_date = str(date_list[upper_time_bound])[:10] + "---" + str(date_list[upper_time_bound])[(10 + 1):]
+lower_time_bound, upper_time_bound, title_start_date, title_end_date, png_start_date, png_end_date = bounds(lower_time_index, upper_time_index, date_list)
 
 ''' ================================================================================================================== '''
 ''' =========================================== PART 6: PLOTTING HUMIDITIES ========================================== '''
@@ -266,7 +272,6 @@ for i in range(len(keys)):
         graph_label = "CVille"
         ax_precip = sorted_df[keys[i]]["Precipitation"].plot(rot = 45, marker = "*", secondary_y = True, color = "blue")
         precip_axis(ax_precip)
-
     if (i == 0):
         ax_hum = sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label)
     else:
@@ -298,7 +303,6 @@ for i in range(len(keys)):
         marker = "*"
         graph_label = "CVille"
         sorted_df[keys[i]]["Temperature"] = sorted_df[keys[i]]["Temperature"].apply(lambda x: (int(x) - 32) / 1.8)
-
     if (i == 0):
         ax_temp = sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = color, marker = marker, label = graph_label)
     else:
@@ -354,10 +358,12 @@ while True:
                 try:
                     if (len(df.columns) > 5):
                         df.columns = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"]
-                    else:
+                    elif (len(df.columns) > 4):
                         df.columns = ["Port", "Date", "Time", "Humidity", "Temperature"]
+                    else:
+                        save_exit(png_start_date, png_end_date)
                 except ValueError or KeyboardInterrupt:
-                    save_and_exit(png_start_date, png_end_date)
+                    save_exit(png_start_date, png_end_date)
                 df_formatter(df)
                 if (len(df.columns) > 3):
                     ax_precip.cla()
@@ -382,12 +388,9 @@ while True:
                 end_date = sorted_df[key].index.tolist()[len(sorted_df[key].index.tolist()) - 1]
                 end_date.strftime("%Y-%m-%d %H:%M:%S")
                 date_list = pd.date_range(start_date, end_date, freq = "s")
-                lower_time_bound = int(lower_time_index * (len(date_list) - 1))
-                upper_time_bound = int(upper_time_index * (len(date_list) - 1))
-                title_start_date = str(date_list[lower_time_bound])[:10] + ", " + str(date_list[lower_time_bound])[(10 + 1):]
-                title_end_date = str(date_list[upper_time_bound])[:10] + ", " + str(date_list[upper_time_bound])[(10 + 1):]
-                png_start_date = str(date_list[lower_time_bound])[:10] + "---" + str(date_list[lower_time_bound])[(10 + 1):]
-                png_end_date = str(date_list[upper_time_bound])[:10] + "---" + str(date_list[upper_time_bound])[(10 + 1):]
+                lower_time_bound, upper_time_bound, title_start_date, title_end_date, png_start_date, png_end_date = bounds(lower_time_index, upper_time_index, date_list)
+            else:
+                save_exit(png_start_date, png_end_date)
     hums_axis(ax_hum, lower_hum_bound, upper_hum_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date)
     temps_axis(ax_temp, lower_temp_bound, upper_temp_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date, date_list, n_desired_ticks)
     plt.show(block = False)
