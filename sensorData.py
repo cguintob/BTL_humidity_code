@@ -1,9 +1,10 @@
-import serial             # Lets the Arduino send its information to the server
-import datetime           # Contains information about the date and time of either current moments or moments in the past and future
-from datetime import date # Module in "datetime" that specifically accesses the date
-import sys                # Allows the user to use command line arguments
-import requests           # Allows the user to get information from a url
-import keyboard           # Allows for keyboard functionality
+import serial               # Lets the Arduino send its information to the server
+import datetime             # Contains information about the date and time of either current moments or moments in the past and future
+from datetime import date   # Module in "datetime" that specifically accesses the date
+import sys                  # Allows the user to use command line arguments
+import requests             # Allows the user to get information from a url
+import keyboard             # Allows for keyboard functionality
+import time                 # Necessary for addressing requests.exceptions.ConnectionErrors
 
 ''' ================================================================================================================== '''
 ''' ==================================================== OVERVIEW ==================================================== '''
@@ -226,8 +227,7 @@ def readserial(comport, baudrate, timestamp = False):
                             converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
                             weather_data.write(str(converted_string))
                         except requests.exceptions.ConnectionError:
-                            requests.renewIPadress()
-                            continue
+                            time.sleep(1)
                         weather_data.write("\n")
                         weather_data.close()
                     
