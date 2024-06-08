@@ -24,25 +24,16 @@ room, and sends information to serial port
 `sensorData.py` --- Takes sensor data from serial port and writes it to data 
 file; fetches weather data from Charlottesville using WTTR and writes it to 
 separate data file  
-`dataReader.py` --- Reads data from files and plots it  
-`otherDataReader.py` --- Used like `dataReader.py` but without weather data from
-Charlottesville  
 `NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
 arbitrary number of data files (in a new format) in any order and can plot 
-updating data  
-`sensorData.py~` `dataReader.py~` `otherDataReader.py~` `NEW_READER.py~` --- Backup versions of 
-each script
+updating data
 
 ### Data Files, Plots, and Other Results
-`merged_data.txt` --- Contains all data taken since the start of the project; 
-shows example of data in the old format  
-`all_humidities_until_5-2.png` `all_temperatures_until_5-2.png` --- Plots of all
- data (used `merged_data.txt` for data and `otherDataReader.py` for plotting)  
-`humidities_apr-30_may-2.png` `temperatures_apr-30_may-2.png` --- Plots of local
- and Charlottesville data between 4/30/2024 and 5/2/2024 (used `dataReader.py` 
-for plotting)
 `EXAMPLE_hums_graph.png` `EXAMPLE_temps_graph.png` --- Example graphs in the 
 new format 
+`2024-06-06---17:53:43_to_2024-06-08---06:52:38.png` --- Example graph in 
+the revised format (both humidities and temperatures are plotted on the 
+same graph  
 `Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project 
 that contains above plots
 `EXAMPLE_sensor_0.txt` `EXAMPLE_weather.txt` `EXAMPLE_sensor_1.txt` --- Data 
@@ -146,42 +137,9 @@ The user will then be prompted to enter their password. After that is entered,
 the program should be freely usable.
 
 
-## USING `dataReader.py` and `otherDataReader.py`
-NOTE: These scripts have neen "upgraded" to a new script using pandas. They are 
-still useful, but not in the same way as the new script.
-
-After the user hits the ALT button, `sensorData.py` will pass the two data files
- to which it was writing to `dataReader.py`, which will then plot them.
-
-5/24/2024 UPDATE: The above feature has been commented out. It remains available
- if necessary. 
-
-`dataReader.py` contains a special function called `number`, which takes two 
-data files and two extra value as inputs. When used with `sensorData.py`, 
-the extra values are set to be 1, letting the program know that it is being used
- with `sensorData.py` and that the two data files are those written to. When not
- used with `sensorData.py`, the extra values must be set to a value *not* equal 
-to 1, letting the program know that it is being used *in the command line*. In 
-this situation, the program is executed as follows:
-
-`python dataReader.py [DATA FILE 1].txt [DATA FILE 2].txt [NUMBER 1] [NUMBER 2]`
-
-As before, `[DATA FILE 1].txt` contains measurements from the sensor while 
-`[DATA FILE 2].txt` contains measurements from WTTR (that were previously 
-collected).
-
-A similar program is `otherDataReader.py` and is executed with the following 
-command:
-
-`python otherDataReader.py [DATA FILE].txt`
-
-This program takes only one file *for sensor measurements*. It is not to be used
- with WTTR data.
-
-
 ## USING `NEW_READER.py`
 This new program takes an arbitrary number of data files in any order and plots 
-them all on graphs similar to those in `dataReader.py`. It is used as follows:
+them all on graphs. It is used as follows:
 
 `python NEW_READER.py [DATA FILE 1].txt [DATA FILE 2].txt [DATA FILE 3].txt ...`
 
@@ -193,6 +151,10 @@ The reasons it takes an arbitrary number of files are:
  file of weather data, or multple sensors with a file of weather data, across 
 differing time periods for each. The files can be passed in any order to 
 prevent mistakes in plotting.
+
+The nice thing about `NEW_READER.py` is that it can display the data as it 
+is being taken. This was implemented 6/8/2024 and allows the user to see the
+ data as it is updating and make decisions about where to go from there.
 
 NOTE: Multiple weather data files can be passed *if they are not on the same 
 time interval*. Just make sure you know which files include weather data 
@@ -210,13 +172,6 @@ sensor:
 If there is already data available, use this command (can be run as a root user 
 *or* not as a root user):
 
-`python dataReader.py [DATA FILE 1].txt [DATA FILE 2].txt [NUMBER 1] [NUMBER 2]`
-
-If the user wishes not to plot Charlottesville weather data, use this command:
-
-`python otherDataReader.py [DATA FILE].txt`
-
-### UPDATE AS OF 5/24/2024
 To plot the data, using the following command:
 
 `python NEW_READER.py [DATA FILE 1].txt [DATA FILE 2].txt [DATA FILE 3].txt ...`
@@ -284,6 +239,18 @@ execute the following command:
 `git reset --soft origin/[BRANCH NAME]`
 
 You can determine the branch name by running `git branch --show-current`.
+
+### Removing Files from GitHub but not Local Directory
+
+Use the following commands:
+
+`git rm --cached [FILES]`
+`git commit -m "[MESSAGE]"`
+`git push`
+
+This series of commands is similar to adding files to GitHub, but instead 
+of just saying `rm` in this case, you must include `--cached`; otherwise,
+ your files will be deleted from your local directory, too.
 
 ### Merging Data into One File
 To merge different datasets into one file, simply use the following command:
