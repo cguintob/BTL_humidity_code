@@ -3,6 +3,7 @@ import matplotlib.dates as mdates     # This is used for plotting the x-ticks wi
 import pandas as pd                   # This creates the dataframes used for plotting and other functionalities.
 import sys                            # This allows the user to enter command-line arguments and shuts down the program if things go wrong.
 from collections import OrderedDict   # This is necessary for ordering the dataframes chronologically.
+import time                           # This is necessary for pausing the program before continuing its execution (see Part 8).
 
 ''' ================================================================================================================== '''
 ''' ==================================================== OVERVIEW ==================================================== '''
@@ -13,6 +14,61 @@ from collections import OrderedDict   # This is necessary for ordering the dataf
 make plotting a lot simpler because you don't need to split the data into lists 
 and loop through them. It's also nice because the index isn't necessary---you 
 can plot solely using the timestamp. '''
+
+''' ================================================================================================================== '''
+''' ============================================ PART 0: HELPER FUNCTIONS ============================================ '''
+''' ================================================================================================================== '''
+
+''' This is the "initialization" section, where I define a few helper functions
+ that execute things that I need to execute multiple times in the program. They
+ will become more apparent later in the program. '''
+
+''' ================================================================================================================== '''
+
+# This function formats and sorts the columns in a dataframe.
+def df_formatter(dataframe):
+    dataframe["Date"] = dataframe["Date"].astype(str) + " " + dataframe["Time"].astype(str)
+    dataframe.rename(columns = {"Date": "Date and Time"}, inplace = True)
+    dataframe["Date and Time"] = pd.to_datetime(dataframe["Date and Time"])
+    dataframe.drop("Time", axis = 1, inplace = True)
+    dataframe.sort_values(by = "Date and Time", inplace = True)
+    dataframe.set_index(["Date and Time"], inplace = True)
+    dataframe.dropna(inplace = True)   # This corrects for any missing values (i.e. removes any row where a NaN appears).
+
+# This function defines some parameters for the axis on which I plot humidities.
+def hums_axis(axis, low_hum, high_hum, low_time, high_time, title_low_time, title_high_time):
+    axis.set_xlabel("")                                                                                    # Only want labels and ticks for the bottom subplot
+    axis.tick_params(axis = "x", bottom = False, labelbottom = False)
+    axis.set_ylabel("Relative Humidity (%)", color = "k")
+    axis.tick_params(axis = "y", labelcolor = "k")
+    axis.set_ylim([low_hum, high_hum])    
+    axis.set_xlim(date_list[low_time], date_list[high_time])
+    axis.set_title("Humidities from {0} to {1}".format(title_low_time, title_high_time), fontsize = 10)
+
+# This function defines some parameters for the axis on which I plot temperatures.
+def temps_axis(axis, low_temp, high_temp, low_time, high_time, title_low_time, title_high_time, x_list, num_ticks):
+    axis.set_xlabel("Date and Time")
+    axis.tick_params(axis = "x", labelsize = 8)
+    axis.xaxis.set_major_locator(mdates.SecondLocator(interval = int(len(x_list) / num_ticks)))            # Frequency of x-ticks
+    axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d\n%H:%M:%S"))                             # Format of x-ticks
+    axis.set_ylabel("Temperature (C)", color = "k")
+    axis.tick_params(axis = "y", labelcolor = "k")
+    axis.set_ylim([low_temp, high_temp])    
+    axis.set_xlim(date_list[low_time], date_list[high_time])
+    axis.set_title("Temperatures from {0} to {1}".format(title_low_time, title_high_time), fontsize = 10)
+    axis.legend(loc = "best", prop = {"size": 10})                                                          # Location of the legend based on data
+
+# This function defines some parameters for axis on which I plot precipitation levels.
+def precip_axis(axis):
+    axis.set_ylabel("Precipitation (mm/3hr)", color = "b")
+    axis.tick_params(axis = "y", labelcolor = "b")
+    axis.set_ylim([0, None])
+
+# This function saves our graphs to the "data_graphs" directory and exits the program.
+def save_and_exit(photo_start, photo_end):
+    plt.savefig("data_graphs/{0}_to_{1}.png".format(photo_start, photo_end))
+    print("Done!")
+    sys.exit(1)
 
 ''' ================================================================================================================== '''
 ''' ============================================= PART 1: GATHERING FILES ============================================ '''
@@ -70,7 +126,7 @@ for f in files:
         if ("df{0}".format(0) not in list(unsorted_df.keys())):
             unsorted_df["df{0}".format(0)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])
         else:
-            unsorted_df["df{0}".format(0)] = unsorted_df["df{0}".format(int(0.5 * (len(sys.argv) - 1)))].append(pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"]), ignore_index = True)
+            unsorted_df["df{0}".format(0)] = unsorted_df["df{0}".format(0)].append(pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"]), ignore_index = True)
     else:
         if ("df{0}".format(df.iloc[0][0] + 1) not in list(unsorted_df.keys())):
             unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])
@@ -109,7 +165,8 @@ I change the elements in the "Date and Time" column to be pandas datetime
 objects, which can be plotted. Next, I delete the "Time" column and sort all 
 the datetime objects in the new "Date and Time" column so that they are in 
 chronological order. Lastly, I set the "Date and Time" column as the index of 
-the dataframe. 
+the dataframe. This is all done in the helper function "df_formatter," which 
+takes a dataframe as its input.
 
 After doing all this, I then define a new list called "date_list," which is a 
 pandas object that creates a list of datetime objects between a start and end 
@@ -124,14 +181,7 @@ and the x-ticks on the plots. '''
 ''' ================================================================================================================== '''
 
 for i in range(len(keys)):
-    sorted_df[keys[i]]["Date"] = sorted_df[keys[i]]["Date"].astype(str) + " " + sorted_df[keys[i]]["Time"].astype(str)
-    sorted_df[keys[i]].rename(columns = {"Date": "Date and Time"}, inplace = True)
-    sorted_df[keys[i]]["Date and Time"] = pd.to_datetime(sorted_df[keys[i]]["Date and Time"])
-    sorted_df[keys[i]].drop("Time", axis = 1, inplace = True)
-    sorted_df[keys[i]].sort_values(by = "Date and Time", inplace = True)
-    sorted_df[keys[i]].set_index(["Date and Time"], inplace = True)
-    
-    sorted_df[keys[i]].dropna(inplace = True)   # This corrects for any missing values (i.e. removes any row where a NaN appears).
+    df_formatter(sorted_df[keys[i]])
 
 start_date = sorted_df[keys[0]].index.tolist()[0]
 end_date = sorted_df[keys[len(keys) - 1]].index.tolist()[len(sorted_df[keys[len(keys) - 1]].index.tolist()) - 1]
@@ -143,10 +193,8 @@ date_list = pd.date_range(start_date, end_date, freq = "s")
 
 ''' These next objects are simply simple ways to store the various bounds for 
 the plots. It makes life easier when they are all 1) defined) and 2) put in 
-the same place. The only bounds not included here is for the lower and upper 
-temperature bounds, which are located where the temperature graphs are 
-defined. I also defined the number of x-ticks I want as well as some colors 
-and markers included in matplotlib.pyplot for ease of definition. '''
+the same place. I also defined the number of x-ticks I want as well as some 
+colors and markers included in matplotlib.pyplot for ease of definition. '''
 
 ''' ================================================================================================================== '''
 
@@ -154,18 +202,20 @@ lower_time_index = 0
 upper_time_index = 1
 lower_time_bound = int(lower_time_index * (len(date_list) - 1))
 upper_time_bound = int(upper_time_index * (len(date_list) - 1))
-lower_hum_bound = 48
-upper_hum_bound = 55
+lower_hum_bound = 0
+upper_hum_bound = 100
+lower_temp_bound = 0
+upper_temp_bound = 30
 
 n_desired_ticks = 10
 colors = ["cyan", "green", "yellow", "magenta"]
 markers = ["x", ".", ",", "v", "^"]
 
-# These two variables are for naming the plots. They'll appear in Parts 6 and 7.
+# These two variables are for naming the plots. They'll appear in Parts 6, 7, and 8.
 title_start_date = str(date_list[lower_time_bound])[:10] + ", " + str(date_list[lower_time_bound])[(10 + 1):]
 title_end_date = str(date_list[upper_time_bound])[:10] + ", " + str(date_list[upper_time_bound])[(10 + 1):]
 
-# These two variables are for naming the saved figures. They'll also appear in Parts 6 and 7.
+# These two variables are for naming the saved figures. They'll appear in Part 8.
 png_start_date = str(date_list[lower_time_bound])[:10] + "---" + str(date_list[lower_time_bound])[(10 + 1):]
 png_end_date = str(date_list[upper_time_bound])[:10] + "---" + str(date_list[upper_time_bound])[(10 + 1):]
 
@@ -198,9 +248,9 @@ After defining the labels and axes, I configure a bunch of other things with the
  plots, including x- and y-labels, the x-ticks (which are defined as dates at an
  interval given by the length of "date_list" divided by the number of desired 
 ticks (I end up getting one extra tick, but that is a least-concern worry)), 
-bounds for the x- and y-axes, a legend, and a plot title. For data-specific 
-configurations, I define things using the axis; for whole-plot configurations, 
-I define things using "plt." '''
+bounds for the x- and y-axes, a legend, and a plot title (all done with the 
+helper function "hums_axis." For data-specific configurations, I define things 
+using the axis; for whole-plot configurations, I define things using "plt." '''
 
 ''' ================================================================================================================== '''
 
@@ -208,29 +258,21 @@ hums = plt.subplot(211)
 for i in range(len(keys)):
     if (len(sorted_df[keys[i]].columns) < 4):
         color = colors[i]
+        marker = markers[i]
         graph_label = "Sensor {0}".format(int(sorted_df[keys[i]]["Port"][0]) + 1)
     else:
         color = "red"
+        marker = "*"
         graph_label = "CVille"
         ax_precip = sorted_df[keys[i]]["Precipitation"].plot(rot = 45, marker = "*", secondary_y = True, color = "blue")
-        ax_precip.set_ylabel("Precipitation (mm/3hr)", color = "b")
-        ax_precip.tick_params(axis = "y", labelcolor = "b")
-        ax_precip.set_ylim([0, None])
+        precip_axis(ax_precip)
 
     if (i == 0):
-        ax_hum = sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = color, marker = markers[i], label = graph_label)
+        ax_hum = sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label)
     else:
-        sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = color, marker = markers[i], label = graph_label)
-        
-ax_hum.set_xlabel("Date and Time")
-ax_hum.tick_params(axis = "x", labelsize = 8)
-ax_hum.xaxis.set_major_locator(mdates.SecondLocator(interval = int(len(date_list) / n_desired_ticks)))   # Frequency for x-ticks
-ax_hum.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d\n%H:%M:%S"))                             # Format for x-ticks
-ax_hum.set_ylabel("Relative Humidity (%)", color = "k")
-ax_hum.tick_params(axis = "y", labelcolor = "k")
-ax_hum.set_ylim([lower_hum_bound, upper_hum_bound])    
-plt.xlim(date_list[lower_time_bound], date_list[upper_time_bound])
-plt.title("Humidities from {0} to {1}".format(title_start_date, title_end_date), fontsize = 10)
+        sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label)
+
+hums_axis(ax_hum, lower_hum_bound, upper_hum_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date)
 
 ''' ================================================================================================================== '''
 ''' ========================================== PART 7: PLOTTING TEMPERATURES ========================================= '''
@@ -245,55 +287,112 @@ in degrees Fahrenheit. To do the latter, I apply a "lambda" modification to each
 
 ''' ================================================================================================================== '''
 
-lower_temp_bound = 0
-upper_temp_bound = 30
-
 temps = plt.subplot(212)
 for i in range(len(keys)):
     if (len(sorted_df[keys[i]].columns) < 4):
         color = colors[i]
+        marker = markers[i]
         graph_label = "Sensor {0}".format(int(sorted_df[keys[i]]["Port"][0]) + 1)
     else:
         color = "red"
+        marker = "*"
         graph_label = "CVille"
         sorted_df[keys[i]]["Temperature"] = sorted_df[keys[i]]["Temperature"].apply(lambda x: (int(x) - 32) / 1.8)
 
     if (i == 0):
-        ax_temp = sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = color, marker = markers[i], label = graph_label)
+        ax_temp = sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = color, marker = marker, label = graph_label)
     else:
-        sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = color, marker = markers[i], label = graph_label)
+        sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = color, marker = marker, label = graph_label)
         
-ax_temp.set_xlabel("Date and Time")
-ax_temp.tick_params(axis = "x", labelsize = 8)
-ax_temp.xaxis.set_major_locator(mdates.SecondLocator(interval = int(len(date_list) / n_desired_ticks)))
-ax_temp.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d\n%H:%M:%S"))
-ax_temp.set_ylabel("Temperature (C)", color = "k")
-ax_temp.tick_params(axis = "y", labelcolor = "k")
-ax_temp.set_ylim([lower_temp_bound, upper_temp_bound])    
-plt.xlim(date_list[lower_time_bound], date_list[upper_time_bound])
-plt.title("Temperatures from {0} to {1}".format(title_start_date, title_end_date), fontsize = 10)
-ax_temp.legend(loc = "best", prop = {"size": 10})                                                   # Location of the legend based on data
+temps_axis(ax_temp, lower_temp_bound, upper_temp_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date, date_list, n_desired_ticks)
 
 ''' ================================================================================================================== '''
 ''' ============================================ PART 8: DISPLAYING PLOTS ============================================ '''
 ''' ================================================================================================================== '''
 
 ''' This section is used for continuously updating the plots with the updating 
-code. If the script is used by itself, it simply holds the graph for 60 seconds 
-and then gets rid of it. If the script is used in interactive_plotter.py, then 
-the graph will be replotted. '''
+code. I first plot the data from the initial dataframes and make the plot show 
+in a nonblocking manner so code can be executed underneath it. I also pause the 
+code for one second before continuing the program. I then define a list called 
+"lastLine," which takes the value of the last line of each file. Next, I run an 
+infinite while loop, in which I clear the plots' axes so I can plot anew, and 
+open all the files given to the program from the command line. I then read each 
+line of the files, and since we're in an infinite while loop, it constantly 
+gathers any new data that was added to them. Next, I define the last line as a 
+dataframe, give it header names based on whether it was sensor or weather data, 
+and format it using "df_formatter." (Importantly, I use a try-except statement 
+here, which checks to see if a line was added. If it was, then I do the above, 
+but if it wasn't, then it's a static dataset, and I exit the program.) Lastly, I
+ do all the things I did in Parts 6 and 7 with plotting and configuring the 
+data. I then display the data on the already created plot. 
+
+The complications with all this are the following:
+1) I'm working with a VERY nested loop, so indentations are VERY important.
+2) I had to redefine end_date and this date_list (and the subsequent variables depending on them) since I'm adding more data. 
+3) I had to cast the values of the new dataframe as floats to use them. 
+4) I'm working with different indices and keys for the appended dataframes since I'm looping over files, not keys in sorted_df.
+
+All in all, it works. And I'm glad it does. '''
 
 ''' ================================================================================================================== '''
 
-try:
-    plt.ion()
-    plt.show()
-    plt.pause(60)
-    plt.close()
-except KeyboardInterrupt:
-    plt.savefig("data_graphs/{0}_to_{1}.png".format(png_start_date, png_end_date))
-    print("Done!")
-    sys.exit(1)
+plt.show(block = False)
+plt.pause(1)
+
+lastLine = [None]*len(files)
+
+while True:
+    ax_hum.cla()
+    ax_temp.cla()
+    for i in range(len(files)):
+        with open(files[i], "r") as f:
+            lines = f.readlines()
+            if lines[-1] != lastLine[i]:
+                lastLine[i] = lines[-1]
+                split_line = lastLine[i].rstrip("\n").split(" ")
+                df = pd.DataFrame([split_line])
+                try:
+                    if (len(df.columns) > 5):
+                        df.columns = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"]
+                    else:
+                        df.columns = ["Port", "Date", "Time", "Humidity", "Temperature"]
+                except ValueError or KeyboardInterrupt:
+                    save_and_exit(png_start_date, png_end_date)
+                df_formatter(df)
+                if (len(df.columns) > 3):
+                    ax_precip.cla()
+                    color = "red"
+                    marker = "*"
+                    label = "CVille"
+                    key = "df{0}".format(0)
+                    df["Temperature"] = df["Temperature"].apply(lambda x: (int(x) - 32) / 1.8)
+                    sorted_df[key]["Precipitation"] = sorted_df[key]["Precipitation"].astype(float)
+                    sorted_df[key]["Precipitation"].plot(rot = 45, ax = ax_precip, marker = "*", secondary_y = True, color = "blue")
+                    precip_axis(ax_precip)
+                else:
+                    color = colors[int(df.iloc[0][0]) + 1]
+                    marker = markers[int(df.iloc[0][0]) + 1]
+                    label = "Sensor {0}".format(int(df.iloc[0][0]) + 1)
+                    key = "df{0}".format(int(df.iloc[0][0]) + 1)
+                sorted_df[key] = sorted_df[key].append(df)
+                sorted_df[key]["Humidity"] = sorted_df[key]["Humidity"].astype(float)
+                sorted_df[key]["Temperature"] = sorted_df[key]["Temperature"].astype(float)
+                sorted_df[key]["Humidity"].plot(rot = 45, ax = ax_hum, color = color, marker = marker, label = label)
+                sorted_df[key]["Temperature"].plot(rot = 45, ax = ax_temp, color = color, marker = marker, label = label)
+                end_date = sorted_df[key].index.tolist()[len(sorted_df[key].index.tolist()) - 1]
+                end_date.strftime("%Y-%m-%d %H:%M:%S")
+                date_list = pd.date_range(start_date, end_date, freq = "s")
+                lower_time_bound = int(lower_time_index * (len(date_list) - 1))
+                upper_time_bound = int(upper_time_index * (len(date_list) - 1))
+                title_start_date = str(date_list[lower_time_bound])[:10] + ", " + str(date_list[lower_time_bound])[(10 + 1):]
+                title_end_date = str(date_list[upper_time_bound])[:10] + ", " + str(date_list[upper_time_bound])[(10 + 1):]
+                png_start_date = str(date_list[lower_time_bound])[:10] + "---" + str(date_list[lower_time_bound])[(10 + 1):]
+                png_end_date = str(date_list[upper_time_bound])[:10] + "---" + str(date_list[upper_time_bound])[(10 + 1):]
+    hums_axis(ax_hum, lower_hum_bound, upper_hum_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date)
+    temps_axis(ax_temp, lower_temp_bound, upper_temp_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date, date_list, n_desired_ticks)
+    plt.show(block = False)
+    plt.pause(1)
+    time.sleep(1)
 
 ''' ================================================================================================================== '''
 ''' ============================================ PART 9: ACKNOWLEDGEMENTS ============================================ '''

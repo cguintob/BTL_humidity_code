@@ -28,10 +28,9 @@ separate data file
 `otherDataReader.py` --- Used like `dataReader.py` but without weather data from
 Charlottesville  
 `NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
-arbitrary number of data files (in a new format) in any order  
-`interactive_plotter.py` --- A script that continuously calls `NEW_READER.py` 
-and can display updating plots with updating datasets
-`sensorData.py~` `dataReader.py~` `otherDataReader.py~` --- Backup versions of 
+arbitrary number of data files (in a new format) in any order and can plot 
+updating data
+`sensorData.py~` `dataReader.py~` `otherDataReader.py~` `NEW_READER.py~` --- Backup versions of 
 each script
 
 ### Data Files, Plots, and Other Results
@@ -199,7 +198,6 @@ NOTE: Multiple weather data files can be passed *if they are not on the same
 time interval*. Just make sure you know which files include weather data 
 and which don't.
 
-Conveniently, `interactive_plotter.py` is used the same as `NEW_READER.py`.
 
 ## SUMMARY
 The following commands, in order, are how to run and plot the data from the 
@@ -223,17 +221,13 @@ To plot the data, using the following command:
 
 `python NEW_READER.py [DATA FILE 1].txt [DATA FILE 2].txt [DATA FILE 3].txt ...`
 
-or
-
-`python interactive_plotter.py [DATA FILE 1].txt [DATA FILE 2].txt [DATA FILE 3].txt ...`
-
 NOTE: You can also specify a file path to a data file in another directory. And 
 if the files all have a common beginning, you can use the `*` method to use them 
 all with the script. As an example:
 
-`python interactive_plotter.py data_runs/run000001*`
+`python NEW_READER.py data_runs/run000001*`
 
-This example assumes you are in the directory where `interative_plotter.py` is 
+This example assumes you are in the directory where `NEW_READER.py` is 
 located and that the directory `data_runs/` is a subdirectory of your current 
 working directory.
 
