@@ -18,7 +18,7 @@ description of the project can be found in
 `aht10.ino` --- Initializes the sensor, measures humidity and temperature in 
 room, and sends information to serial port  
 `AHTxx.cpp` --- Arduino library  
-`AHTxx.h`   --- Header file for arduino library
+`AHTxx.h`   --- Header file for Arduino library
 
 ### Python Scripts
 `sensorData.py` --- Takes sensor data from serial port and writes it to data 
@@ -34,8 +34,7 @@ new format
 `2024-06-06---17:53:43_to_2024-06-08---06:52:38.png` --- Example graph in 
 the revised format (both humidities and temperatures are plotted on the 
 same graph  
-`Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project 
-that contains above plots
+`Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project  
 `EXAMPLE_sensor_0.txt` `EXAMPLE_weather.txt` `EXAMPLE_sensor_1.txt` --- Data 
 files taken between 5/24/2024 at 3:23.47 pm and 5/26/2024 at 1:28:29 am in 
 the new format
@@ -60,8 +59,8 @@ The second section of the program is an infinite loop that collects measurements
  indefinitely via the following:
 1. Define the variable "humidity" to be the humidity measured by the sensor. The
  definition accesses a function in `aht10` that measures the humidity. 
-2. Define the variable "temperature" in the same way, but pass through the 
-respective function the opposite boolean so that the measurements are separate.
+2. Define the variable "temperature" in the same way but pass through the 
+respective function the opposite Boolean so that the measurements are separate.
 3. Print the values to the serial monitor.
 4. Get the next measurement after a certain number of ms (in our case, after
  1000 ms).
@@ -83,7 +82,7 @@ used, we can change the number after "ACM" to switch the port
 
 NOTE: When you execute this command, the sensor will *not* appear to be 
 collecting measurements; however, it is. Check the serial monitor on the Arduino
- interface to be sure, or execture `sensorData.py` to see the values printed to 
+ interface to be sure, or execute `sensorData.py` to see the values printed to 
 the screen.
 
 NOTE: `aht10.ino` can collect measurements indefinitely or after a set amount of
@@ -91,6 +90,12 @@ NOTE: `aht10.ino` can collect measurements indefinitely or after a set amount of
 are or aren't commented out. The user can also modify how many points per second
  are collected and how long they want to collect data for, if this is how they 
 want to use the program.
+
+NOTE: This code can be executed using the Arduino IDE, as well. In fact, this 
+may be the optimal method of running the Arduino. However, I like running it 
+from the command line to keep everything in the command line. It is important to
+ note that to do this, `aht10.ino`, `AHTxx.cpp`, and `AHT10xx.h` must be 
+contained in a folder. Otherwise, the code will not work.
 
 
 ## USING `sensorData.py`
@@ -123,8 +128,7 @@ The point of collecting this data for our purposes is to compare our measured
 values from the sensor with those outside in the city to see how the measured 
 values fluctuate with the outside environment. This data is written to the 
 second data file. `keyboard` allows the user to stop collecting data when they 
-hit the spacebar. When the ALT button is hit, the program will terminate and 
-plot the data using `dataReader.py`, which is imported into the program.
+hit the spacebar. When the ALT button is hit, the program will terminate.
 
 NOTE: Because `keyboard` only works with root access, the user must be logged in
  as a root user to execute the function. This can be accomplished by running the
@@ -152,8 +156,9 @@ differing time periods for each. The files can be passed in any order to
 prevent mistakes in plotting.
 
 The nice thing about `NEW_READER.py` is that it can display the data as it 
-is being taken. This was implemented 6/8/2024 and allows the user to see the
- data as it is updating and make decisions about where to go from there.
+is being taken and will only stop plotting if all the data files have finished 
+updating. This was implemented 6/8/2024 -- 6/10/2024 and allows the user to see 
+the data as it is updating and make decisions about where to go from there.
 
 NOTE: Multiple weather data files can be passed *if they are not on the same 
 time interval*. Just make sure you know which files include weather data 
@@ -218,13 +223,13 @@ and the values that are listed as humidities are actually temperatures and vice
 versa. To fix this, simply use `Ctrl-C` or `Ctrl-Z` (the latter is slightly
 nicer to the program) and rerun the command with different data files.
 
-NOTE: This bug was fixed by editing `aht10.ino` to sent `sensorData.py` a 
+NOTE: This bug was fixed by editing `aht10.ino` to send `sensorData.py` a 
 counter. `sensorData.py` will then determine whether that counter is odd or 
 even, and depending on which it is, it will write temperature or humidity 
 measurements to the data file.
 
 ### Can't Push Files to GitHub
-Sometimes changes to your files and those that appear on GitHub become out of 
+Sometimes, changes to your files and those that appear on GitHub become out of 
 sync. This can happen if you accidentally commit something but forget to push it
  or if you modify your files in GitHub when you usually do it on the command 
 line. To check the status of Git, execute the following command:
@@ -256,11 +261,9 @@ To merge different datasets into one file, simply use the following command:
 
 `cat [DATA FILE 1].txt [DATA FILE 2].txt ... > [MERGED DATA FILE].txt`
 
-This is useful when using `otherDataReader.py`.
-
-### `NEW_READER` gives a shaded area instead of a line
+### `NEW_READER` Gives Shaded Area instead of Line
 This is a result of using multiple weather data files along the same time 
 period. Use only one.
 
-### `NEW_READER.py` taking a long time to load
+### `NEW_READER.py` Taking Long Time to Load
 Just be patient. It's working, I promise.
