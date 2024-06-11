@@ -37,17 +37,21 @@ def df_formatter(dataframe):
 
 # This function defines the start and end dates by comparing the corresponding indices in the dataframes in the dictionary.
 def start_end(key_list, dictionary):
-    for i in range(len(key_list) - 1):
-        if (pd.Timestamp(dictionary[key_list[i]].index.tolist()[0]) < pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[0])):   # Check if date in 1st comes before that in 2nd
-            start = dictionary[key_list[i]].index.tolist()[0]                                                                         # If so, set that equal to "start"
-        else:                    
-            start = dictionary[key_list[i + 1]].index.tolist()[0]                                                                     # If not, set the other equal to "start" 
-        if (pd.Timestamp(dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]) < 
-            pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1])):           # Do the same with the last dates in dfs
-            end = dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1]                     # If 1 > 2, set 2 = "end"
-        else:
-            end = dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]                             # If the opposite, do the opposite
-    return (start, end)                                                                                                               # Return both values
+    if (len(key_list) == 1):   # If there is only one data file given...
+        start = dictionary[key_list[0]].index.tolist()[0]
+        end = dictionary[key_list[0]].index.tolist()[len(dictionary[key_list[0]].index.tolist()) - 1]
+    else:
+        for i in range(len(key_list) - 1):
+            if (pd.Timestamp(dictionary[key_list[i]].index.tolist()[0]) < pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[0])):   # Check if date in 1st occurs before 2nd
+                start = dictionary[key_list[i]].index.tolist()[0]                                                                         # If so, set that equal to "start"
+            else:                    
+                start = dictionary[key_list[i + 1]].index.tolist()[0]                                                                     # If not, set the other equal to "start" 
+            if (pd.Timestamp(dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]) < 
+                pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1])):           # Do the same with the last dates in dfs
+                end = dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1]                     # If 1 > 2, set 2 = "end"
+            else:
+                end = dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]                             # If the opposite, do the opposite
+    return (start, end)                                                                                                                   # Return both values
 
 ''' This function defines the bounds and some dates to be used for naming. The 
 first two are the lower and upper time bounds, respectively, used for the 
@@ -290,10 +294,12 @@ using "plt." '''
 # This is a dataframe used for displaying the mean and standard deviation of the humidities and temperatures of the weather data and the data from each sensor.
 columns = []
 for i in range(len(keys)):
-    if (i == 0):
-        columns.append("Weather")
-    else:
-        columns.append("Sensor {0}".format(i))
+    if ("df{0}".format(0) in keys):
+        if ("Weather" not in columns):
+            columns.append("Weather")
+    if ("df{0}".format(i + 1) in keys):
+        if ("Sensor {0}".format(i + 1) not in columns):
+            columns.append("Sensor {0}".format(i + 1))
 stats = pd.DataFrame(index = ["Humidity", "Temperature"], columns = columns)
 
 hums = plt.subplot(211)   # Define a subplot. "211" maps to "2 rows," "1 column," "1st subplot"
@@ -445,7 +451,7 @@ while True:
         time.sleep(1)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
-        save_exit(png_start_date, png_end_date)
+        sys.exit(1)
 
 ''' ================================================================================================================== '''
 ''' ============================================ PART 9: ACKNOWLEDGEMENTS ============================================ '''
