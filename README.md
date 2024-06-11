@@ -65,6 +65,9 @@ respective function the opposite Boolean so that the measurements are separate.
 4. Get the next measurement after a certain number of ms (in our case, after
  1000 ms).
 
+Depending on the PC used (i.e. an old Centos7 system, Geekom), different commands must be used to execute the Arduino from the command line.
+
+### Old Centos7 System
 To execute `aht10.ino`, use the following command: 
 
 `arduino --upload --port [SERIAL PORT] [PROGRAM].ino`
@@ -96,6 +99,24 @@ may be the optimal method of running the Arduino. However, I like running it
 from the command line to keep everything in the command line. It is important to
  note that to do this, `aht10.ino`, `AHTxx.cpp`, and `AHT10xx.h` must be 
 contained in a folder. Otherwise, the code will not work.
+
+### Geekom PC
+First, the Arduino client `arduino-cli` must be installed onto the PC and placed
+ in the directory where the code will be run. Once it is installed, we can
+compile and upload the Arduino script using the following commands:
+
+`./arduino-cli compile -b [BOARD NAME] [FILE PATH]/[FILE NAME]`
+`./arduino-cli upload -p [PORT] [FILE PATH]/[FILE NAME]`
+
+The flag `-p` stands for "port," which is used above. The flag `-b` stands for
+"board," which is the Arduino board recognized by the IDE (if the board isn't 
+recognized, it must be installed). One can find the board name of the Arduino by
+ running the following command:
+
+`./arduino-cli board list`
+
+The board name will be under the "FQBN" column, which stands for "Fully 
+Qualified Board Name." The file path and name are self explanatory.
 
 
 ## USING `sensorData.py`
@@ -173,8 +194,10 @@ sensor:
 3. `python sensorData.py [INTEGER] [DATA FILE 1].txt [DATA FILE 2].txt`
 4. `alt`
 
-If there is already data available, use this command (can be run as a root user 
-*or* not as a root user):
+If we are using a Geekom PC, switch command #1 with the following commands:
+
+1. `./arduino-cli compile -b [BOARD NAME] [FILE PATH]/[FILE NAME]`
+2. `./arduino-cli upload -p [PORT] [FILE PATH]/[FILE NAME]`
 
 To plot the data, using the following command:
 
@@ -196,7 +219,10 @@ working directory.
 If a program isn't working, check the permissions on it using the following 
 command:
 
-`ls -l`
+`ls -l(h)`
+
+(The `-h` flag stands for "human-readable format" and displays everything in a
+more comprehensible format.)
 
 If the desired file has root permissions, use the following command to change it
  to user permissions:
@@ -248,13 +274,94 @@ You can determine the branch name by running `git branch --show-current`.
 
 Use the following commands:
 
-`git rm --cached [FILES]`
-`git commit -m "[MESSAGE]"`
+`git rm --cached [FILES]`  
+`git commit -m "[MESSAGE]"`  
 `git push`
 
 This series of commands is similar to adding files to GitHub, but instead 
 of just saying `rm` in this case, you must include `--cached`; otherwise,
  your files will be deleted from your local directory, too.
+
+### Getting Changes Pushed from One Local Repository to Another
+If your GitHub repository is connected to several different local repositories
+on different machines and you make changes to your files on one repository but
+not another, you will first need to push your changes to GitHub from your
+current local repository (call it R1 for our purposes) and then pull the
+changes pushed to GitHub to the other local repository (call it R2).
+
+In R2, run the following command:
+
+`git pull`
+
+You may be prompted to enter your sudo password. If so, enter it. The changes
+you made in R1 will then be given to R2. It is important to note that if you
+made changes to the files in R2, they will be overwritten by the changes you
+made in R1. Either copy the files if you want to record those changes
+somewhere or accept defeat.
+
+### Initializing Repository and Connecting to GitHub
+Check to see if git is installed on the machine you want to connect to
+GitHub by running the following command:
+
+`git --version`
+
+If git is installed, it will return the version of git on the machine. If
+not, install git using either a Debian/Ubuntu system installation (top) or
+ a Fedora/CentOS system installation (bottom):
+
+`sudo apt-get update` + `sudo apt-get install git-all`
+`sudo dnf(yum) update` + `sudo dnf(yum) install git-all`
+
+Create a directory where you want to initialize git and type the following
+command:
+
+`git init`
+
+You must create a new SSH key and connect it to your GitHub repository. To
+do this, run the following command:
+
+`ssh-keygen -t ed25519 -C [GITHUB EMAIL]`
+
+where your GitHub email is the email to which your GitHub is linked.
+
+Next, start the ssh-agent in the background with the following command:
+
+`eval "$(ssh-agent -s)"`
+
+Then, add your key to the ssh-agent with the following command:
+
+`ssh-add ~/.ssh/id_ed25519`
+
+Once this is done, copy the SSH key to the clipboard. It can be found by
+using the following command:
+
+`cat ~/.ssh/id_ed25519.pub`
+
+Then, go to your GitHub account and click "Settings." Under the "Access"
+section of the sidebar, click "SSH and GPG Keys." Click "New SSH Key" and
+title the key to fit your needs. After selecting the key type, paste the key
+ to the field and click "Add SSH Key." The key should be ready for use now.
+
+If you have a repository on GitHub already, you can clone that repository to
+ your local directory with the following command:
+
+`git clone git@github.com:[USERNAME]/[REPOSITORY].git`
+
+where your username is your GitHub username and the repository is the
+repository you want to clone.
+
+If you don't have a repository on GitHub already, you can use the series of
+ commands in the directory where you have the code you want to track with
+git:
+
+`git add [FILES]`
+`git commit -m "[MESSAGE"]`
+Click "New Repository" in GitHub, name it the same as your directory, and
+click "Create Repository"  
+`git remote add origin git@github.com:[USERNAME]/[REPOSITORY].git`  
+`git push -u origin master`
+
+The repositories should be linked now.
 
 ### Merging Data into One File
 To merge different datasets into one file, simply use the following command:

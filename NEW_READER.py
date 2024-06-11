@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt       # This creates the plots and their characteristics.
 import matplotlib.dates as mdates     # This is used for plotting the x-ticks with datetimes.
-import pandas as pd                   # This creates the dataframes used for plotting and other functionalities.
 import sys                            # This allows the user to enter command-line arguments and shuts down the program if things go wrong.
 from collections import OrderedDict   # This is necessary for ordering the dataframes chronologically.
 import time                           # This is necessary for pausing the program before continuing its execution (see Part 8).
+import warnings                       # This is used to disable warning messages, specifically FutureWarning messages when used on Python >2.
+warnings.simplefilter(action = "ignore", category = FutureWarning)
+import pandas as pd                   # This creates the dataframes used for plotting and other functionalities.
 
 ''' ================================================================================================================== '''
 ''' ==================================================== OVERVIEW ==================================================== '''
@@ -82,7 +84,10 @@ def hums_axis(axis, low_hum, high_hum, low_time, high_time, title_low_time, titl
 def temps_axis(axis, low_temp, high_temp, low_time, high_time, title_low_time, title_high_time, x_list, num_ticks):
     axis.set_xlabel("Date and Time")
     axis.tick_params(axis = "x", labelsize = 8)
-    axis.xaxis.set_major_locator(mdates.SecondLocator(interval = int(len(x_list) / num_ticks)))             # Frequency of x-ticks
+    if (len(x_list) < (2 * num_ticks)):
+        axis.xaxis.set_major_locator(mdates.SecondLocator(interval = 1))
+    else:
+        axis.xaxis.set_major_locator(mdates.SecondLocator(interval = int(len(x_list) / num_ticks)))         # Frequency of x-ticks
     axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d\n%H:%M:%S"))                              # Format of x-ticks
     axis.set_ylabel("Temperature (C)", color = "k")
     axis.tick_params(axis = "y", labelcolor = "k")
@@ -93,6 +98,7 @@ def temps_axis(axis, low_temp, high_temp, low_time, high_time, title_low_time, t
 
 # This function defines some parameters for axis on which I plot precipitation levels.
 def precip_axis(axis):
+    axis.yaxis.set_label_position("right")
     axis.set_ylabel("Precipitation (mm/3hr)", color = "b")
     axis.tick_params(axis = "y", labelcolor = "b")
     axis.set_ylim([0, None])
@@ -173,12 +179,12 @@ for f in files:
         if ("df{0}".format(0) not in list(unsorted_df.keys())):
             unsorted_df["df{0}".format(0)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])
         else:
-            unsorted_df["df{0}".format(0)] = unsorted_df["df{0}".format(0)].append(pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"]), ignore_index = True)
+            unsorted_df["df{0}".format(0)] = pd.concat([unsorted_df["df{0}".format(0)], pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])])
     else:
         if ("df{0}".format(df.iloc[0][0] + 1) not in list(unsorted_df.keys())):
             unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])
         else:
-            unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = unsorted_df["df{0}".format(df.iloc[0][0] + 1)].append(pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"]), ignore_index = True)
+            unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.concat([unsorted_df["df{0}".format(df.iloc[0][0] + 1)], pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])])
 
 ''' ================================================================================================================== '''
 ''' ================================================ PART 3: ORDERING ================================================ '''
@@ -393,30 +399,30 @@ replot_counter = [0] * len(files)    # Do the same as for lastLine, but with all
 
 while True:
     try:
-        replot_counter = [0] * len(files)                                # Reset this counter every time the while loop runs
+        replot_counter = [0] * len(files)                                      # Reset this counter every time the while loop runs
         for i in range(len(files)):
-            with open(files[i], "r") as f:                               # Open the files...
-                lines = f.readlines()                                    # Read their lines...
-                if (lines[-1] != lastLine[i]):                           # If the last line is not equal to whatever was collected to be the last line from before...
-                    lastLine[i] = lines[-1]                              # ...set it equal to that line...
-                    split_line = lastLine[i].rstrip("\n").split(" ")     # ...format the line by eliminating the newline character and splitting between spaces...
-                    df = pd.DataFrame([split_line])                      # ...and create a new dataframe out of that line as a list
+            with open(files[i], "r") as f:                                     # Open the files...
+                lines = f.readlines()                                          # Read their lines...
+                if (lines[-1] != lastLine[i]):                                 # If the last line is not equal to whatever was collected to be the last line from before...
+                    lastLine[i] = lines[-1]                                    # ...set it equal to that line...
+                    split_line = lastLine[i].rstrip("\n").split(" ")           # ...format the line by eliminating the newline character and splitting between spaces...
+                    df = pd.DataFrame([split_line])                            # ...and create a new dataframe out of that line as a list
                     try:
-                        if (len(df.columns) > 4):                        # If there are the appropriate number of columns...
-                            if (len(df.columns) > 5):                    # ...and we have weather data...
+                        if (len(df.columns) > 4):                              # If there are the appropriate number of columns...
+                            if (len(df.columns) > 5):                          # ...and we have weather data...
                                 df.columns = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"]
                                 df["Temperature"] = df["Temperature"].apply(lambda x: (int(x) - 32) / 1.8)
                                 key = "df{0}".format(0)
-                            else:                                        # ...otherwise, we have sensor data
+                            else:                                              # ...otherwise, we have sensor data
                                 df.columns = ["Port", "Date", "Time", "Humidity", "Temperature"]
                                 key = "df{0}".format(int(df.iloc[0][0]) + 1)
-                            df_formatter(df)                             # Format the dataframe as before
-                            sorted_df[key] = sorted_df[key].append(df)   # Add the dataframe to the appropriate dataframe in sorted_df
-                        else:                                            # If we don't have the appropriate number of columns (i.e. there was a timeout)...
-                            continue                                     # ...do nothing
-                    except ValueError:                                   # If there are NO columns, then we note that using replot
+                            df_formatter(df)                                   # Format the dataframe as before
+                            sorted_df[key] = pd.concat([sorted_df[key], df])   # Add the dataframe to the appropriate dataframe in sorted_df
+                        else:                                                  # If we don't have the appropriate number of columns (i.e. there was a timeout)...
+                            continue                                           # ...do nothing
+                    except ValueError:                                         # If there are NO columns, then we note that using replot
                         replot_counter[i] = replot(i, replot_counter, png_start_date, png_end_date)
-                else:                                                    # Likewise, if the last line of the file is nonexistent, note it using replot
+                else:                                                          # Likewise, if the last line of the file is nonexistent, note it using replot
                     replot_counter[i] = replot(i, replot_counter, png_start_date, png_end_date)
         ax_hum.cla()                                                   # Now that we've made updates to sorted_df, we can replot by clearing the plots' axes
         ax_temp.cla()
