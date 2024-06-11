@@ -84,7 +84,7 @@ def hums_axis(axis, low_hum, high_hum, low_time, high_time, title_low_time, titl
 def temps_axis(axis, low_temp, high_temp, low_time, high_time, title_low_time, title_high_time, x_list, num_ticks):
     axis.set_xlabel("Date and Time")
     axis.tick_params(axis = "x", labelsize = 8)
-    if (len(x_list) < (2 * num_ticks)):
+    if (len(x_list) < (1.5 * num_ticks)):   # This is so that I can plot fewer than 10 points
         axis.xaxis.set_major_locator(mdates.SecondLocator(interval = 1))
     else:
         axis.xaxis.set_major_locator(mdates.SecondLocator(interval = int(len(x_list) / num_ticks)))         # Frequency of x-ticks
