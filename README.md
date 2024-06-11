@@ -65,9 +65,10 @@ respective function the opposite Boolean so that the measurements are separate.
 4. Get the next measurement after a certain number of ms (in our case, after
  1000 ms).
 
-Depending on the PC used (i.e. an old Centos7 system, Geekom), different commands must be used to execute the Arduino from the command line.
+Depending on the PC used (i.e. an old Centos7 system, Geekom), different
+commands must be used to execute the Arduino from the command line.
 
-### Old Centos7 System
+### Old CentOS7 System
 To execute `aht10.ino`, use the following command: 
 
 `arduino --upload --port [SERIAL PORT] [PROGRAM].ino`
@@ -354,14 +355,15 @@ If you don't have a repository on GitHub already, you can use the series of
  commands in the directory where you have the code you want to track with
 git:
 
-`git add [FILES]`
-`git commit -m "[MESSAGE"]`
+`git add [FILES]`  
+`git commit -m "[MESSAGE"]`  
 Click "New Repository" in GitHub, name it the same as your directory, and
 click "Create Repository"  
 `git remote add origin git@github.com:[USERNAME]/[REPOSITORY].git`  
 `git push -u origin master`
 
-The repositories should be linked now.
+The repositories should be linked now. Ideally, you'll create a `README.md` file
+ and a `.gitignore.txt` file.
 
 ### Merging Data into One File
 To merge different datasets into one file, simply use the following command:
