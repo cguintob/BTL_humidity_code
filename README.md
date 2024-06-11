@@ -390,3 +390,7 @@ To merge different datasets into one file, simply use the following command:
 
 ### `NEW_READER.py` Taking Long Time to Load
 Just be patient. It's working, I promise.
+
+
+## ACKNOWLEDGEMENTS
+Code written by Christian Guinto-Brody for Professor Chris Neu's research group.
