@@ -172,19 +172,16 @@ The reasons it takes an arbitrary number of files are:
 1. There are multiple sensors running at the same time.
 2. There is data from multiple time periods.
 
-`NEW_READER.py` can plot data from just one sensor, multiple sensors, just one
- file of weather data, or multple sensors with a file of weather data, across 
-differing time periods for each. The files can be passed in any order to 
-prevent mistakes in plotting.
+`NEW_READER.py` can plot data from just one sensor, multiple sensors, multple 
+sensors with a file of weather data, multiple files of weather data, or any 
+combination of sensor and weather data, across the same or differing time 
+periods for each. The files can be passed in any order to prevent mistakes in 
+plotting. As long as at least one file is passed, the program will plot it.
 
 The nice thing about `NEW_READER.py` is that it can display the data as it 
 is being taken and will only stop plotting if all the data files have finished 
 updating. This was implemented 6/8/2024 -- 6/10/2024 and allows the user to see 
 the data as it is updating and make decisions about where to go from there.
-
-NOTE: Multiple weather data files can be passed *if they are not on the same 
-time interval*. Just make sure you know which files include weather data 
-and which don't.
 
 
 ## SUMMARY
@@ -300,6 +297,23 @@ made changes to the files in R2, they will be overwritten by the changes you
 made in R1. Either copy the files if you want to record those changes
 somewhere or accept defeat.
 
+If you've made changes to the files in R2, you may run into a situation where 
+fetching and pulling will tell you that you're either already up to date on R2 
+or that you must commit or stash your changes before pulling. Even if you want 
+to overwrite the changes you made in R2, you won't be able to. So, use this 
+series of commands:
+
+`git fetch --all`  
+`git branch backup-master`  
+`git reset --hard origin/master`
+
+`git fetch` downloads the latest files from the remote repository without trying
+ to merge or rebase; `git reset` resets the master branch to what you just 
+fetched, while the `--hard` option changes your files in the working tree to 
+match the files in `origin/master`.
+
+[Source](https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files)
+
 ### Initializing Repository and Connecting to GitHub
 Check to see if git is installed on the machine you want to connect to
 GitHub by running the following command:
@@ -365,14 +379,14 @@ click "Create Repository"
 The repositories should be linked now. Ideally, you'll create a `README.md` file
  and a `.gitignore.txt` file.
 
+[Source 1](https://kbroman.org/github_tutorial/pages/init.html) 
+[Source 2](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) 
+[Source 3](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+
 ### Merging Data into One File
 To merge different datasets into one file, simply use the following command:
 
 `cat [DATA FILE 1].txt [DATA FILE 2].txt ... > [MERGED DATA FILE].txt`
-
-### `NEW_READER` Gives Shaded Area instead of Line
-This is a result of using multiple weather data files along the same time 
-period. Use only one.
 
 ### `NEW_READER.py` Taking Long Time to Load
 Just be patient. It's working, I promise.
