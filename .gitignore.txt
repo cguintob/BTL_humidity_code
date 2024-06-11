@@ -4,4 +4,3 @@
 dataReader.py~
 sensorData.py~
 data_file7.txt
-README.md~
