@@ -106,7 +106,7 @@ First, the Arduino client `arduino-cli` must be installed onto the PC and placed
  where the code will be run). Once it is installed, we can compile and upload
 the Arduino script using the following commands:
 
-`./[PATH IF NEEDED]/arduino-cli compile -b [BOARD NAME] [FILE PATH]/[FILE NAME]`
+`./[PATH IF NEEDED]/arduino-cli compile -b [BOARD NAME] [FILE PATH]/[FILE NAME]`  
 `./[PATH IF NEEDED]/arduino-cli upload -p [PORT] [FILE PATH]/[FILE NAME]`
 
 or
