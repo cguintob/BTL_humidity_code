@@ -202,6 +202,7 @@ def readserial(comport, baudrate, timestamp = False):
                         data_file.write(str(data))
                         data_file.write(" ")
                         print(str(day) + " " + str(time))
+                        print("Sensor {0}".format(int(port_num) + 1))
                         print("Humidity: " + data + "%")
                         
                     # This writes the temperature to the data file.
