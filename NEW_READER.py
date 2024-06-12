@@ -225,16 +225,17 @@ for f in files:
     df = pd.read_csv(f, sep = " ", header = None)   # Create a dataframe by reading the contents of the file f
     ''' The if part of the if-else statement defines the weather data; the else part defines the sensor data. 
     Both parts contain if-else statements---if the dataframe doesn't already exist, define it; if it does, add to it. '''
-    if (len(df.columns) > 5):   # Denotes weather data
-        if ("df{0}".format(0) not in list(unsorted_df.keys())):
-            unsorted_df["df{0}".format(0)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])
+    if (len(df.columns) < 7):
+        if (len(df.columns) == 6):   # Denotes weather data
+            if ("df{0}".format(0) not in list(unsorted_df.keys())):
+                unsorted_df["df{0}".format(0)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])
+            else:
+                unsorted_df["df{0}".format(0)] = pd.concat([unsorted_df["df{0}".format(0)], pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])])
         else:
-            unsorted_df["df{0}".format(0)] = pd.concat([unsorted_df["df{0}".format(0)], pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])])
-    else:
-        if ("df{0}".format(df.iloc[0][0] + 1) not in list(unsorted_df.keys())):
-            unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])
-        else:
-            unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.concat([unsorted_df["df{0}".format(df.iloc[0][0] + 1)], pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])])
+            if ("df{0}".format(df.iloc[0][0] + 1) not in list(unsorted_df.keys())):
+                unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])
+            else:
+                unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.concat([unsorted_df["df{0}".format(df.iloc[0][0] + 1)], pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])])
 
 ''' ================================================================================================================== '''
 ''' ================================================ PART 3: ORDERING ================================================ '''
