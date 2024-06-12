@@ -228,6 +228,7 @@ def readserial(comport, baudrate, timestamp = False):
                             converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
                             weather_data.write(str(converted_string))
                         except requests.exceptions.ConnectionError:
+                            weather_data.write("\n")
                             time.sleep(1)
                         weather_data.write("\n")
                         weather_data.close()
