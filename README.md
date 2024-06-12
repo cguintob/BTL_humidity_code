@@ -337,7 +337,9 @@ do this, run the following command:
 
 `ssh-keygen -t ed25519 -C [GITHUB EMAIL]`
 
-where your GitHub email is the email to which your GitHub is linked.
+where your GitHub email is the email to which your GitHub is linked. The screen
+will prompt you to enter a file in which to save the key, but hitting enter will
+ save the key to the default location.
 
 Next, start the ssh-agent in the background with the following command:
 
