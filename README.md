@@ -41,8 +41,7 @@ the new format
 
 ### Miscellaneous/Housekeeping
 `README.md` --- Contains information about project and how to use programs  
-`.gitignore.txt` --- Contains files that are not tracked by Git (includes backup
- version `.gitignore.txt~`)  
+`.gitignore.txt` --- Contains files that are not tracked by Git  
 `.gitattributes` --- Used for pushing files that are larger than the maximum 
 allowed size for pushing
 
@@ -103,11 +102,16 @@ contained in a folder. Otherwise, the code will not work.
 
 ### Geekom PC
 First, the Arduino client `arduino-cli` must be installed onto the PC and placed
- in the directory where the code will be run. Once it is installed, we can
-compile and upload the Arduino script using the following commands:
+ in the directory where the code will be run (or in a directory in the directory
+ where the code will be run). Once it is installed, we can compile and upload
+the Arduino script using the following commands:
 
-`./arduino-cli compile -b [BOARD NAME] [FILE PATH]/[FILE NAME]`
-`./arduino-cli upload -p [PORT] [FILE PATH]/[FILE NAME]`
+`./[PATH IF NEEDED]/arduino-cli compile -b [BOARD NAME] [FILE PATH]/[FILE NAME]`
+`./[PATH IF NEEDED]/arduino-cli upload -p [PORT] [FILE PATH]/[FILE NAME]`
+
+or
+
+`./[PATH IF NEEDED]/arduino-cli upload [FILE PATH]/[FILE NAME] -p [PORT] -b [BOARD NAME]`
 
 The flag `-p` stands for "port," which is used above. The flag `-b` stands for
 "board," which is the Arduino board recognized by the IDE (if the board isn't 
@@ -194,8 +198,12 @@ sensor:
 
 If we are using a Geekom PC, switch command #1 with the following commands:
 
-1. `./arduino-cli compile -b [BOARD NAME] [FILE PATH]/[FILE NAME]`
-2. `./arduino-cli upload -p [PORT] [FILE PATH]/[FILE NAME]`
+1. `./[PATH IF NEEDED]/arduino-cli compile -b [BOARD NAME] [FILE PATH]/[FILE NAME]`
+2. `./[PATH IF NEEDED]/arduino-cli upload -p [PORT] [FILE PATH]/[FILE NAME]`
+
+or
+
+`./[PATH IF NEEDED]/arduino-cli upload [FILE PATH]/[FILE NAME] -p [PORT] -b [BOARD NAME]`
 
 To plot the data, using the following command:
 
