@@ -3,7 +3,7 @@ import matplotlib.dates as mdates     # This is used for plotting the x-ticks wi
 import sys                            # This allows the user to enter command-line arguments and shuts down the program if things go wrong.
 from collections import OrderedDict   # This is necessary for ordering the dataframes chronologically.
 import time                           # This is necessary for pausing the program before continuing its execution (see Part 8).
-import warnings                       # This is used to disable warning messages, specifically FutureWarning messages when used on Python >2.
+import warnings                       # This is used to disable warning messages, specifically FutureWarning messages when used on Python 3 and above.
 warnings.simplefilter(action = "ignore", category = FutureWarning)
 import pandas as pd                   # This creates the dataframes used for plotting and other functionalities.
 
@@ -18,12 +18,38 @@ and loop through them. It's also nice because the index isn't necessary---you
 can plot solely using the timestamp. '''
 
 ''' ================================================================================================================== '''
-''' ============================================ PART 0: HELPER FUNCTIONS ============================================ '''
+''' ============================================= PART i: DEFINING BOUNDS ============================================ '''
+''' ================================================================================================================== '''
+
+''' These objects are simply simple ways to store the various bounds for the 
+plots. It makes life easier when they are all 1) defined) and 2) put in the 
+same place. I also defined the number of x-ticks I want as well as some 
+colors and markers included in matplotlib.pyplot for ease of definition. '''
+
+''' ================================================================================================================== '''
+
+lower_time_index = 0    # Factor denoting what fraction from the start date we're including on the graph (cannot be greater than upper_time_index, lower bound: 0)
+upper_time_index = 1    # Same as above, but for end date (cannot be less than lower_time_index, upper bound: 1)
+lower_hum_bound = 0     # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
+upper_hum_bound = 100   # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
+lower_temp_bound = 0    # Lower bound on temperature (cannot be greater than upper_temp_bound)
+upper_temp_bound = 30   # Upper bound on temperature (cannot be less than lower_temp_bound)
+stat_low_index = 0      # Factor denoting what fraction from the start date we're including in the statistics (cannot be greater than stat_high_index, lower bound: 0)
+stat_high_index = 1     # Same as above, but for the end date (cannot be less than stat_low_index, upper bound = 1)
+switcher = 0            # Number denoting whether we want unchanging or changing statistics (0 for changing, 1 for unchanging)
+
+n_desired_ticks = 10   # Sometimes there are 11 ticks shown on the x-axis, but ultimately, we want constant and evenly-spaced ticks
+colors = ["cyan", "green", "yellow", "magenta"]
+markers = ["x", ".", ",", "v", "^"]
+
+''' ================================================================================================================== '''
+''' =========================================== PART ii: HELPER FUNCTIONS ============================================ '''
 ''' ================================================================================================================== '''
 
 ''' This is the "initialization" section, where I define a few helper functions 
-that execute things that I need to execute multiple times in the program. They 
-will become more apparent later in the program. '''
+(defined in order of appearance in the program) that execute things that I need 
+to execute multiple times in the program. They will become more apparent later 
+in the program. '''
 
 ''' ================================================================================================================== '''
 
@@ -55,6 +81,18 @@ def start_end(key_list, dictionary):
                 end = dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]                             # If the opposite, do the opposite
     return (start, end)                                                                                                                   # Return both values
 
+# This function makes sure all the bounds/bound indices are appropriate.
+def bound_checker(low, high, num):
+    if (low > high):
+        print("At least one of your lower bounds is greater than its corresponding upper bound. This cannot occur.".format(bound))
+        sys.exit(1)
+    if (num == 0):
+        if (low < 0):
+            print("At least one of your lower indices is less than 0. This cannot occur.")
+            sys.exit(1)
+        if (high > 1):
+            print("At least one of your upper indices is greater than 1. This cannot occur.")
+
 ''' This function defines the bounds and some dates to be used for naming. The 
 first two are the lower and upper time bounds, respectively, used for the 
 x-axis and other things. The second two are the start and end dates and times 
@@ -69,6 +107,25 @@ def bounds(low_time, high_time, list_of_dates):
     start_for_photo = str(list_of_dates[lower_bound])[:10] + "---" + str(list_of_dates[lower_bound])[(10 + 1):] 
     end_for_photo = str(list_of_dates[upper_bound])[:10] + "---" + str(list_of_dates[upper_bound])[(10 + 1):]
     return (lower_bound, upper_bound, start_for_title, end_for_title, start_for_photo, end_for_photo)
+
+# This function defines the bounds and the list of dates to use for displaying the statistics.
+def stat_bounds(list_of_dates, lower_bound, upper_bound):
+    stat_low = int(lower_bound * (len(list_of_dates) - 1))
+    stat_high = int(upper_bound * (len(list_of_dates) - 1))
+    title_start = str(list_of_dates[stat_low])[:10] + " at " + str(list_of_dates[stat_low])[(10 + 1):]
+    title_end = str(list_of_dates[stat_high])[:10] + " at " + str(list_of_dates[stat_high])[(10 + 1):]
+    return (stat_low, stat_high, title_start, title_end)
+
+# This function defines some parameters for axis on which I plot precipitation levels.
+def precip_axis(axis):
+    axis.yaxis.set_label_position("right")
+    axis.set_ylabel("Precipitation (mm/3hr)", color = "b")
+    axis.tick_params(axis = "y", labelcolor = "b")
+    axis.set_ylim([0, None])
+
+# This function defines the elements of the statistics dataframe printed to the screen.
+def statistics_placer(stat_df, num, index, series, lower_bound, upper_bound):
+    stat_df.loc[stat_df.index.tolist()[num], stat_df.columns.tolist()[index]] = str(series[lower_bound:upper_bound].mean().round(4)) + " +/- " + str(series[lower_bound:upper_bound].std().round(4))
 
 # This function defines some parameters for the axis on which I plot humidities.
 def hums_axis(axis, low_hum, high_hum, low_time, high_time, title_low_time, title_high_time):
@@ -96,24 +153,17 @@ def temps_axis(axis, low_temp, high_temp, low_time, high_time, title_low_time, t
     axis.set_title("Temperatures from {0} to {1}".format(title_low_time, title_high_time), fontsize = 10)   
     axis.legend(loc = "best", prop = {"size": 10})                                                          # Location of legend based on data
 
-# This function defines some parameters for axis on which I plot precipitation levels.
-def precip_axis(axis):
-    axis.yaxis.set_label_position("right")
-    axis.set_ylabel("Precipitation (mm/3hr)", color = "b")
-    axis.tick_params(axis = "y", labelcolor = "b")
-    axis.set_ylim([0, None])
+# This function simply plots the statistics dataframe. It's included for organizational purposes.
+def printing_stats(dataframe, title_start, title_end):
+    print("Mean and Standard Deviation from {0} to {1}".format(title_start, title_end))
+    print(dataframe)
+    print("=================================================================================")
 
 # This function saves the figure and closes the program at the end of its functioning.
 def save_exit(photo_start, photo_end):
     plt.savefig("data_graphs/{0}_to_{1}.png".format(photo_start, photo_end))
     print("Saved to ~/BTL_humidity_code/data_graphs as {0}_to_{1}.png".format(photo_start, photo_end))
     sys.exit(1)
-
-# This function simply plots the statistics dataframe. It's included for organizational purposes.
-def printing_stats(dataframe, plot_start, plot_end):
-        print("Mean and Standard Deviation from {0} to {1}".format(plot_start, plot_end))
-        print(dataframe)
-        print("=================================================================================")
 
 # This function is for deciding whether to continue plotting the files or to save the figure and exit.
 def replot(index, a_list, photo_start, photo_end):
@@ -238,28 +288,22 @@ start_date, end_date = start_end(keys, sorted_df)             # See Part 0 for h
 date_list = pd.date_range(start_date, end_date, freq = "s")   # Pandas date range from start_date to end_date with a frequencty of every second
 
 ''' ================================================================================================================== '''
-''' ============================================= PART 5: DEFINING BOUNDS ============================================ '''
+''' ============================================ PART 5: REVISTING BOUNDS ============================================ '''
 ''' ================================================================================================================== '''
 
-''' These next objects are simply simple ways to store the various bounds for 
-the plots. It makes life easier when they are all 1) defined) and 2) put in 
-the same place. I also defined the number of x-ticks I want as well as some 
-colors and markers included in matplotlib.pyplot for ease of definition. '''
+''' This section does more with the bounds defined in Part i, namely making 
+sure they're valid and also defining some more bounds that depend on the 
+ones we defined above using the functions defined in Part ii. '''
 
 ''' ================================================================================================================== '''
 
-lower_time_index = 0    # Factor denoting what fraction from the start date we're including on the graph
-upper_time_index = 1    # Same as above, but from the end date
-lower_hum_bound = 0     # Lower bound on humidity
-upper_hum_bound = 100   # Upper bound on humidity
-lower_temp_bound = 0    # Lower bound on temperature
-upper_temp_bound = 30   # Upper bound on temperature
-
-n_desired_ticks = 10   # Sometimes there are 11 ticks shown on the x-axis, but ultimately, we want constant and evenly-spaced ticks
-colors = ["cyan", "green", "yellow", "magenta"]
-markers = ["x", ".", ",", "v", "^"]
+bound_checker(lower_time_index, upper_time_index, 0)
+bound_checker(lower_hum_bound, upper_hum_bound, 1)
+bound_checker(lower_temp_bound, upper_temp_bound, 1)
+bound_checker(stat_low_index, stat_high_index, 0)
 
 lower_time_bound, upper_time_bound, title_start_date, title_end_date, png_start_date, png_end_date = bounds(lower_time_index, upper_time_index, date_list)
+stat_lower_bound, stat_upper_bound, stat_title_start, stat_title_end = stat_bounds(date_list, stat_low_index, stat_high_index)
 
 ''' ================================================================================================================== '''
 ''' =========================================== PART 6: PLOTTING HUMIDITIES ========================================== '''
@@ -293,7 +337,11 @@ desired ticks (I end up getting one extra tick, but that is a least-concern
 worry)), bounds for the x- and y-axes, a legend, and a plot title (all done 
 with the helper function "hums_axis." For data-specific configurations, I 
 define things using the axis; for whole-plot configurations, I define things 
-using "plt." '''
+using "plt."
+
+In addition to defining my graphs, I also define a new dataframe called 
+"stats," in which I display the mean and standard deviation of every 
+data file included for a given range.  '''
 
 ''' ================================================================================================================== '''
 
@@ -324,7 +372,7 @@ for i in range(len(keys)):
         ax_hum = sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label)
     else:
         sorted_df[keys[i]]["Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label)
-    stats.loc[stats.index.tolist()[0], stats.columns.tolist()[i]] = str(sorted_df[keys[i]]["Humidity"].mean().round(4)) + " +/- " + str(sorted_df[keys[i]]["Humidity"].std().round(4))
+    statistics_placer(stats, 0, i, sorted_df[keys[i]]["Humidity"], stat_lower_bound, stat_upper_bound)
 
 hums_axis(ax_hum, lower_hum_bound, upper_hum_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date)
 
@@ -356,7 +404,7 @@ for i in range(len(keys)):
         ax_temp = sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = color, marker = marker, label = graph_label)
     else:
         sorted_df[keys[i]]["Temperature"].plot(rot = 45, color = color, marker = marker, label = graph_label)
-    stats.loc[stats.index.tolist()[1], stats.columns.tolist()[i]] = str(sorted_df[keys[i]]["Temperature"].mean().round(4)) + " +/- " + str(sorted_df[keys[i]]["Temperature"].std().round(4))     
+    statistics_placer(stats, 1, i, sorted_df[keys[i]]["Temperature"], stat_lower_bound, stat_upper_bound)
    
 temps_axis(ax_temp, lower_temp_bound, upper_temp_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date, date_list, n_desired_ticks)
 
@@ -390,7 +438,7 @@ All in all, it works. And I'm glad it does. '''
 
 ''' ================================================================================================================== '''
 
-printing_stats(stats, title_start_date, title_end_date)   # This just prints the statistics dataframe to the screen with nice formatting
+printing_stats(stats, stat_title_start, stat_title_end)   # This just prints the statistics dataframe to the screen with nice formatting
 plt.show(block = False)                                   # Plot the graph with nonblocking behavior so code can run while it's plotted
 plt.pause(1)                                              # Pause the program for 1 second before continuing
 
@@ -430,6 +478,8 @@ while True:
         end_date.strftime("%Y-%m-%d %H:%M:%S")                         # This is for formatting. I ran into an issue for some reason
         date_list = pd.date_range(start_date, end_date, freq = "s")    # We must also recalculate the date range (since the end date is presumably different) as well as our bounds
         lower_time_bound, upper_time_bound, title_start_date, title_end_date, png_start_date, png_end_date = bounds(lower_time_index, upper_time_index, date_list)
+        if (switcher == 0):
+            stat_lower_bound, stat_upper_bound, stat_title_start, stat_title_end = stat_bounds(date_list, stat_low_index, stat_high_index)
         for i in range(len(keys)):   # This part is basically Parts 6 and 7, just written a little differently
             if (len(sorted_df[keys[i]].columns) > 3):
                 ax_precip.cla()      # Clear the secondary precipitation axis, too
@@ -447,11 +497,13 @@ while True:
             sorted_df[keys[i]]["Temperature"] = sorted_df[keys[i]]["Temperature"].astype(float)
             sorted_df[keys[i]]["Humidity"].plot(rot = 45, ax = ax_hum, color = color, marker = marker, label = label)
             sorted_df[keys[i]]["Temperature"].plot(rot = 45, ax = ax_temp, color = color, marker = marker, label = label)
-            stats.loc[stats.index.tolist()[0], stats.columns.tolist()[i]] = str(sorted_df[keys[i]]["Humidity"].mean().round(4)) + " +/- " + str(sorted_df[keys[i]]["Humidity"].std().round(4))
-            stats.loc[stats.index.tolist()[1], stats.columns.tolist()[i]] = str(sorted_df[keys[i]]["Temperature"].mean().round(4)) + " +/- " + str(sorted_df[keys[i]]["Temperature"].std().round(4))
+            if (switcher == 0):
+                statistics_placer(stats, 0, i, sorted_df[keys[i]]["Humidity"], stat_lower_bound, stat_upper_bound)
+                statistics_placer(stats, 1, i, sorted_df[keys[i]]["Temperature"], stat_lower_bound, stat_upper_bound)
         hums_axis(ax_hum, lower_hum_bound, upper_hum_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date)
         temps_axis(ax_temp, lower_temp_bound, upper_temp_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date, date_list, n_desired_ticks)
-        printing_stats(stats, title_start_date, title_end_date)
+        if (switcher == 0):
+            printing_stats(stats, stat_title_start, stat_title_end)
         plt.show(block = False)
         plt.pause(1)
         time.sleep(1)
