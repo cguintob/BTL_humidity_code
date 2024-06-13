@@ -159,19 +159,10 @@ def printing_stats(dataframe, title_start, title_end):
     print(dataframe)
     print("=================================================================================")
 
-# This function saves the figure and closes the program at the end of its functioning.
-def save_exit(photo_start, photo_end):
+# This function saves the plot to a PNG.
+def photo_saver(photo_start, photo_end):
     plt.savefig("data_graphs/{0}_to_{1}.png".format(photo_start, photo_end))
     print("Saved to ~/BTL_humidity_code/data_graphs as {0}_to_{1}.png".format(photo_start, photo_end))
-    sys.exit(1)
-
-# This function is for deciding whether to continue plotting the files or to save the figure and exit.
-def replot(index, a_list, photo_start, photo_end):
-    a_list[i] += 1                          # Increase the element by 1
-    if (0 not in a_list):                   # If all the elements are increased by 1 (from 0), then save the plot and exit the program
-        print("Done!")
-        save_exit(photo_start, photo_end)   
-    return a_list[i]                        # Return the value of the list element
 
 ''' ================================================================================================================== '''
 ''' ============================================= PART 1: GATHERING FILES ============================================ '''
@@ -440,15 +431,15 @@ All in all, it works. And I'm glad it does. '''
 ''' ================================================================================================================== '''
 
 printing_stats(stats, stat_title_start, stat_title_end)   # This just prints the statistics dataframe to the screen with nice formatting
+photo_saver(png_start_date, png_end_date)                 # This saves the graph as a PNG
 plt.show(block = False)                                   # Plot the graph with nonblocking behavior so code can run while it's plotted
 plt.pause(30)                                             # Pause the program for 1 second before continuing
 
-lastLine = [None] * len(files)       # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file
-replot_counter = [0] * len(files)    # Do the same as for lastLine, but with all the values being 0. This list is used for collecting information about which files are still updating
+lastLine = [None] * len(files)   # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file
+start_time = int(time.time())    # This gets the current time and will be used for saving a figure every hour
 
 while True:
     try:
-        replot_counter = [0] * len(files)                                      # Reset this counter every time the while loop runs
         for i in range(len(files)):
             with open(files[i], "r") as f:                                     # Open the files...
                 lines = f.readlines()                                          # Read their lines...
@@ -469,10 +460,10 @@ while True:
                             sorted_df[key] = pd.concat([sorted_df[key], df])   # Add the dataframe to the appropriate dataframe in sorted_df
                         else:                                                  # If we don't have the appropriate number of columns (i.e. there was a timeout)...
                             continue                                           # ...do nothing
-                    except ValueError:                                         # If there are NO columns, then we note that using replot
-                        replot_counter[i] = replot(i, replot_counter, png_start_date, png_end_date)
-                else:                                                          # Likewise, if the last line of the file is nonexistent, note it using replot
-                    replot_counter[i] = replot(i, replot_counter, png_start_date, png_end_date)
+                    except ValueError:                                         # If there are NO columns, then we do nothing
+                        continue
+                else:                                                          # Likewise, if the last line of the file is nonexistent, do nothing
+                    continue
         ax_hum.cla()                                                   # Now that we've made updates to sorted_df, we can replot by clearing the plots' axes
         ax_temp.cla()
         start_date, end_date = start_end(keys, sorted_df)              # Since new dates were added, we must recalculate the start and end dates
@@ -505,6 +496,10 @@ while True:
         temps_axis(ax_temp, lower_temp_bound, upper_temp_bound, lower_time_bound, upper_time_bound, title_start_date, title_end_date, date_list, n_desired_ticks)
         if (switcher == 0):
             printing_stats(stats, stat_title_start, stat_title_end)
+        end_time = int(time.time())            # Current time after the loop runs
+        if ((end_time - start_time) > 3600):   # Every hour (3600 seconds since we're using the number of seconds since January 1, 1970), save the plot
+            photo_saver(png_start_date, png_end_date)
+            start_time = end_time
         plt.show(block = False)
         plt.pause(15)
         time.sleep(15)
