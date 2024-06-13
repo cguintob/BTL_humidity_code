@@ -104,8 +104,8 @@ def bounds(low_time, high_time, list_of_dates):
     upper_bound = int(high_time * (len(list_of_dates) - 1))
     start_for_title = str(list_of_dates[lower_bound])[:10] + " at " + str(list_of_dates[lower_bound])[(10 + 1):]
     end_for_title = str(list_of_dates[upper_bound])[:10] + " at " + str(list_of_dates[upper_bound])[(10 + 1):]
-    start_for_photo = str(list_of_dates[lower_bound])[:10] + "---" + str(list_of_dates[lower_bound])[(10 + 1):] 
-    end_for_photo = str(list_of_dates[upper_bound])[:10] + "---" + str(list_of_dates[upper_bound])[(10 + 1):]
+    start_for_photo = str(list_of_dates[lower_bound])[:10] + "_at_" + str(list_of_dates[lower_bound])[(10 + 1):] 
+    end_for_photo = str(list_of_dates[upper_bound])[:10] + "_at_" + str(list_of_dates[upper_bound])[(10 + 1):]
     return (lower_bound, upper_bound, start_for_title, end_for_title, start_for_photo, end_for_photo)
 
 # This function defines the bounds and the list of dates to use for displaying the statistics.
@@ -163,7 +163,8 @@ def printing_stats(dataframe, title_start, title_end):
 def photo_saver(photo_start, photo_end):
     plt.savefig("data_graphs/{0}_to_{1}.png".format(photo_start, photo_end))
     print("Saved to ~/BTL_humidity_code/data_graphs as {0}_to_{1}.png".format(photo_start, photo_end))
-
+    print("=================================================================================")
+    
 ''' ================================================================================================================== '''
 ''' ============================================= PART 1: GATHERING FILES ============================================ '''
 ''' ================================================================================================================== '''
