@@ -1,6 +1,12 @@
+import sys                            # This allows the user to enter command-line arguments and shuts down the program if things go wrong.
+if (sys.version_info[0] == 3):        # I needed tkinter to display figures on my local machine if I ssh onto a remote machine. However, the name of the module changed with Python 3.
+    import tkinter as tk
+else:
+    import Tkinter as tk
+import matplotlib                     # I messed up the program playing with (installing) backend services and now I must manually set the backend this way. Whoops.
+matplotlib.use("tkagg")
 import matplotlib.pyplot as plt       # This creates the plots and their characteristics.
 import matplotlib.dates as mdates     # This is used for plotting the x-ticks with datetimes.
-import sys                            # This allows the user to enter command-line arguments and shuts down the program if things go wrong.
 from collections import OrderedDict   # This is necessary for ordering the dataframes chronologically.
 import time                           # This is necessary for pausing the program before continuing its execution (see Part 8).
 import warnings                       # This is used to disable warning messages, specifically FutureWarning messages when used on Python 3 and above.
@@ -434,7 +440,7 @@ All in all, it works. And I'm glad it does. '''
 printing_stats(stats, stat_title_start, stat_title_end)   # This just prints the statistics dataframe to the screen with nice formatting
 photo_saver(png_start_date, png_end_date)                 # This saves the graph as a PNG
 plt.show(block = False)                                   # Plot the graph with nonblocking behavior so code can run while it's plotted
-plt.pause(30)                                             # Pause the program for 1 second before continuing
+plt.pause(30)                                             # Pause the program for 30 seconds before continuing
 
 lastLine = [None] * len(files)   # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file
 start_time = int(time.time())    # This gets the current time and will be used for saving a figure every hour
