@@ -187,6 +187,7 @@ def readserial(comport, baudrate, timestamp = False):
                     if (isinstance(int(data), int) == True):
                         counter = int(data)
                     else:
+                        print("Raising ValueError in try portion of try-except statement.")
                         raise ValueError
                 except ValueError:
 
@@ -228,8 +229,9 @@ def readserial(comport, baudrate, timestamp = False):
                             converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"}) # Replaces all these delimiters with ""
                             weather_data.write(str(converted_string))
                         except requests.exceptions.ConnectionError:
+                            print("Raising a requests.exceptions.ConnectionError")
                             weather_data.write("\n")
-                            time.sleep(1)
+                            time.sleep(20)
                         weather_data.write("\n")
                         weather_data.close()
                     

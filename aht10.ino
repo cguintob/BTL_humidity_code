@@ -24,14 +24,14 @@ void loop() {
      Serial.println(counter);
 
      // This is for determining how often we take measurements.
-     int points_per_second = 1;
+     float points_per_minute = 6.0;
 
      // For collecting an unspecified number of measurements...
      float humidity = aht10.readHumidity(true);          // Define humidity to be the measurement from the sensor
      float temperature = aht10.readTemperature(false);   // Define temperature to be the measurement from the sensor
      Serial.println(humidity);			         // Print the humidity value to the serial monitor     
      Serial.println(temperature);                        // Print the temperature value to the serial monitor
-     delay((1/points_per_second) * 1000);                // Wait a certain number of ms before collecting the next measurements
+     delay(int(60.0 * (1/points_per_minute)) * 1000);    // Wait a certain number of ms before collecting the next measurements
      counter += 2;		   			 // Add 2 to the counter because two different measurements pass for each iteration.
 
      // For collecting measurements for a set period of time...

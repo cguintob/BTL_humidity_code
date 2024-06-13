@@ -30,8 +30,8 @@ colors and markers included in matplotlib.pyplot for ease of definition. '''
 
 lower_time_index = 0    # Factor denoting what fraction from the start date we're including on the graph (cannot be greater than upper_time_index, lower bound: 0)
 upper_time_index = 1    # Same as above, but for end date (cannot be less than lower_time_index, upper bound: 1)
-lower_hum_bound = 0     # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
-upper_hum_bound = 100   # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
+lower_hum_bound = 30    # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
+upper_hum_bound = 70    # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
 lower_temp_bound = 0    # Lower bound on temperature (cannot be greater than upper_temp_bound)
 upper_temp_bound = 30   # Upper bound on temperature (cannot be less than lower_temp_bound)
 stat_low_index = 0      # Factor denoting what fraction from the start date we're including in the statistics (cannot be greater than stat_high_index, lower bound: 0)
@@ -441,7 +441,7 @@ All in all, it works. And I'm glad it does. '''
 
 printing_stats(stats, stat_title_start, stat_title_end)   # This just prints the statistics dataframe to the screen with nice formatting
 plt.show(block = False)                                   # Plot the graph with nonblocking behavior so code can run while it's plotted
-plt.pause(1)                                              # Pause the program for 1 second before continuing
+plt.pause(30)                                             # Pause the program for 1 second before continuing
 
 lastLine = [None] * len(files)       # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file
 replot_counter = [0] * len(files)    # Do the same as for lastLine, but with all the values being 0. This list is used for collecting information about which files are still updating
@@ -506,8 +506,8 @@ while True:
         if (switcher == 0):
             printing_stats(stats, stat_title_start, stat_title_end)
         plt.show(block = False)
-        plt.pause(1)
-        time.sleep(1)
+        plt.pause(15)
+        time.sleep(15)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
         sys.exit(1)
