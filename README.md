@@ -123,6 +123,10 @@ recognized, it must be installed). One can find the board name of the Arduino by
 The board name will be under the "FQBN" column, which stands for "Fully 
 Qualified Board Name." The file path and name are self explanatory.
 
+NOTE: As of 6/13/2024, I discovered that any changes you make to `aht10.ino`
+will *not* be registered until you compile and upload the script using the
+Arduino IDE. Since we're not changing `aht0.ino` enough for this to occur, I
+am not worrying too hard about it.
 
 ## USING `sensorData.py`
 `sensorData.py` is used with the following command:
@@ -143,9 +147,8 @@ file (they're actually appended so no data is lost).
 serial port number in the first column. This is useful for using 
 `NEW_READER.py`.
 
-The unique features of this program are its use of `requests` and `keyboard`, 
-two Python libraries that allow the program to fetch information from websites 
-and allow the user keyboard functionality when operating the program. 
+The unique feature of this program is its use of `requests`, a Python library
+that allow the program to fetch information from websites. 
 
 `requests` is used to get Charlottesville humidity, temperature, and 
 precipitation values using WTTR, a "console-oriented weather forecast service" 
@@ -153,12 +156,11 @@ that allows users to collect meteorological data from anywhere in the world.
 The point of collecting this data for our purposes is to compare our measured 
 values from the sensor with those outside in the city to see how the measured 
 values fluctuate with the outside environment. This data is written to the 
-second data file. `keyboard` allows the user to stop collecting data when they 
-hit the spacebar. When the ALT button is hit, the program will terminate.
+second data file.
 
-NOTE: Because `keyboard` only works with root access, the user must be logged in
- as a root user to execute the function. This can be accomplished by running the
- following command:
+NOTE: It appears `serial` only works with root access, so the user must be
+logged in as a root user to execute the function. This can be accomplished by
+running the following command:
 
 `sudo su`
 
