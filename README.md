@@ -22,7 +22,8 @@ room, and sends information to serial port
 
 ### Python Scripts
 `sensorData.py` --- Takes sensor data from serial port and writes it to data 
-file; fetches weather data from Charlottesville using WTTR and writes it to 
+file
+`weatherData.py` --- Fetches weather data from Charlottesville using WTTR and writes it to 
 separate data file  
 `NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
 arbitrary number of data files (in a new format) in any order and can plot 
@@ -131,12 +132,11 @@ am not worrying too hard about it.
 ## USING `sensorData.py`
 `sensorData.py` is used with the following command:
 
-`python sensorData.py [INTEGER] [DATA FILE 1].txt [DATA FILE 2].txt`
+`python sensorData.py [INTEGER] [DATA FILE].txt`
 1. `python` --- The executing function
 2. `sensorData.py` --- The Python program
 3. `[INTEGER]` --- A number telling the program which serial port to use
-4. `[DATAFILE 1].txt` --- Includes measurements from the sensor
-5. `[DATAFILE 2].txt` --- Includes measurements from Charlottesville using WTTR
+4. `[DATA FILE].txt` --- Includes measurements from the sensor
 
 After the program is run, it will print whatever is sent to the serial port by
 `aht10.ino` to the screen. Those values, as well as the date and time of the 
@@ -147,17 +147,6 @@ file (they're actually appended so no data is lost).
 serial port number in the first column. This is useful for using 
 `NEW_READER.py`.
 
-The unique feature of this program is its use of `requests`, a Python library
-that allow the program to fetch information from websites. 
-
-`requests` is used to get Charlottesville humidity, temperature, and 
-precipitation values using WTTR, a "console-oriented weather forecast service" 
-that allows users to collect meteorological data from anywhere in the world. 
-The point of collecting this data for our purposes is to compare our measured 
-values from the sensor with those outside in the city to see how the measured 
-values fluctuate with the outside environment. This data is written to the 
-second data file.
-
 NOTE: It appears `serial` only works with root access, so the user must be
 logged in as a root user to execute the function. This can be accomplished by
 running the following command:
@@ -166,6 +155,25 @@ running the following command:
 
 The user will then be prompted to enter their password. After that is entered, 
 the program should be freely usable.
+
+
+## USING `weatherData.py`
+This works the same as `sensorData.py`, only not as a root user:
+
+`python weatherData.py [DATA FILE].txt`
+
+It also doesn't take a port number.
+
+The unique feature of this program is its use of `requests`, a Python library 
+that allow the program to fetch information from websites.
+
+`requests` is used to get Charlottesville humidity, temperature, and 
+precipitation values using WTTR, a "console-oriented weather forecast service" 
+that allows users to collect meteorological data from anywhere in the world. 
+The point of collecting this data for our purposes is to compare our measured 
+values from the sensor with those outside in the city to see how the measured 
+values fluctuate with the outside environment. This data is written to the 
+second data file.
 
 
 ## USING `NEW_READER.py`
@@ -195,8 +203,8 @@ The following commands, in order, are how to run and plot the data from the
 sensor:
 1. `arduino --upload --port [PORT] aht10.ino`
 2. `sudo su`
-3. `python sensorData.py [INTEGER] [DATA FILE 1].txt [DATA FILE 2].txt`
-4. `alt`
+3. `python sensorData.py [INTEGER] [DATA FILE].txt`
+4. `python weatherData.py [DATA FILE].txt`     
 
 If we are using a Geekom PC, switch command #1 with the following commands:
 

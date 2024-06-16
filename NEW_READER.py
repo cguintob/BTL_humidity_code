@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt       # This creates the plots and their charact
 import matplotlib.dates as mdates     # This is used for plotting the x-ticks with datetimes.
 from collections import OrderedDict   # This is necessary for ordering the dataframes chronologically.
 import time                           # This is necessary for pausing the program before continuing its execution (see Part 8).
+import datetime                       # This is necessary for determining whether the files are weather data or sensor data.
 import warnings                       # This is used to disable warning messages, specifically FutureWarning messages when used on Python 3 and above.
 warnings.simplefilter(action = "ignore", category = FutureWarning)
 import pandas as pd                   # This creates the dataframes used for plotting and other functionalities.
@@ -71,21 +72,35 @@ def df_formatter(dataframe):
 
 # This function defines the start and end dates by comparing the corresponding indices in the dataframes in the dictionary.
 def start_end(key_list, dictionary):
+    cur_start = dictionary[key_list[0]].index.tolist()[0]                                               # These variables keep track of the first data files given
+    cur_end = dictionary[key_list[0]].index.tolist()[len(dictionary[key_list[0]].index.tolist()) - 1]
     if (len(key_list) == 1):   # If there is only one data file given...
-        start = dictionary[key_list[0]].index.tolist()[0]
+        start = dictionary[key_list[0]].index.tolist()[0] 
         end = dictionary[key_list[0]].index.tolist()[len(dictionary[key_list[0]].index.tolist()) - 1]
     else:
         for i in range(len(key_list) - 1):
             if (pd.Timestamp(dictionary[key_list[i]].index.tolist()[0]) < pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[0])):   # Check if date in 1st occurs before 2nd
-                start = dictionary[key_list[i]].index.tolist()[0]                                                                         # If so, set that equal to "start"
-            else:                    
-                start = dictionary[key_list[i + 1]].index.tolist()[0]                                                                     # If not, set the other equal to "start" 
-            if (pd.Timestamp(dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]) < 
-                pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1])):           # Do the same with the last dates in dfs
-                end = dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1]                     # If 1 > 2, set 2 = "end"
+                if (pd.Timestamp(cur_start) < pd.Timestamp(dictionary[key_list[i]].index.tolist()[0])):
+                    start = cur_start
+                else:
+                    start = dictionary[key_list[i]].index.tolist()[0]
             else:
-                end = dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]                             # If the opposite, do the opposite
-    return (start, end)                                                                                                                   # Return both values
+                if (pd.Timestamp(cur_start) < pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[0])):
+                    start = cur_start
+                else:
+                    start = dictionary[key_list[i + 1]].index.tolist()[0]                                                         # If not, set the other equal to "start"
+            if (pd.Timestamp(dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]) > 
+                pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1])):   # Do the same with the last dates in dfs
+                if (pd.Timestamp(cur_end) > pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1])):
+                    end = cur_end
+                else:
+                    end = dictionary[key_list[i]].index.tolist()[len(dictionary[key_list[i]].index.tolist()) - 1]
+            else:
+                if (pd.Timestamp(cur_end) > pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1])):
+                    end = cur_end
+                else:
+                    end = dictionary[key_list[i + 1]].index.tolist()[len(dictionary[key_list[i + 1]].index.tolist()) - 1]   # If the opposite, do the opposite
+    return (start, end)   # Return both values
 
 # This function makes sure all the bounds/bound indices are appropriate.
 def bound_checker(low, high, num):
@@ -195,7 +210,7 @@ else:
     print("Use the following format: python NEW_READER.py [datafile1].txt [datafile2].txt [datafile3].txt ...\n")
     print("Can also be used like this: python NEW_READER.py path_to_datafiles/[filename]*")
     sys.exit(1)
-
+    
 ''' ================================================================================================================== '''
 ''' ================================================ PART 2: DATAFRAMES ============================================== '''
 ''' ================================================================================================================== '''
@@ -220,21 +235,27 @@ Some features of note here are the following:
 
 unsorted_df = {}
 for f in files:
-    df = pd.read_csv(f, sep = " ", header = None)   # Create a dataframe by reading the contents of the file f
-    ''' The if part of the if-else statement defines the weather data; the else part defines the sensor data. 
-    Both parts contain if-else statements---if the dataframe doesn't already exist, define it; if it does, add to it. '''
-    if (len(df.columns) < 7):
-        if (len(df.columns) == 6):   # Denotes weather data
+    try:
+        df = pd.read_csv(f, sep = " ", header = None)   # Create a dataframe by reading the contents of the file
+        for i in range(len(df.index)):
+            if (len(df.loc[i, :].values.flatten().tolist()) > 5):
+                df.drop([i], inplace = True)
+        ''' The if part of the if-else statement defines the weather data; the else part defines the sensor data. 
+        Both parts contain if-else statements---if the dataframe doesn't already exist, define it; if it does, add to it. '''
+        if (isinstance(df.iloc[0][0], str) == True):   # Denotes weather data
             if ("df{0}".format(0) not in list(unsorted_df.keys())):
-                unsorted_df["df{0}".format(0)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])
+                unsorted_df["df{0}".format(0)] = pd.read_csv(f, sep = " ", header = None, names = ["Date", "Time", "Humidity", "Temperature", "Precipitation"])
             else:
-                unsorted_df["df{0}".format(0)] = pd.concat([unsorted_df["df{0}".format(0)], pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"])])
+                unsorted_df["df{0}".format(0)] = pd.concat([unsorted_df["df{0}".format(0)], pd.read_csv(f, sep = " ", header = None, names = ["Date", "Time", "Humidity", "Temperature", "Precipitation"])])
         else:
             if ("df{0}".format(df.iloc[0][0] + 1) not in list(unsorted_df.keys())):
                 unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])
             else:
                 unsorted_df["df{0}".format(df.iloc[0][0] + 1)] = pd.concat([unsorted_df["df{0}".format(df.iloc[0][0] + 1)], pd.read_csv(f, sep = " ", header = None, names = ["Port", "Date", "Time", "Humidity", "Temperature"])])
-
+    except FileNotFoundError:
+        print("Couldn't find file. Choose a file that is in the directory and has data in it.")
+        sys.exit(1)
+        
 ''' ================================================================================================================== '''
 ''' ================================================ PART 3: ORDERING ================================================ '''
 ''' ================================================================================================================== '''
@@ -357,11 +378,11 @@ stats = pd.DataFrame(index = ["Humidity", "Temperature"], columns = columns)
 
 hums = plt.subplot(211)   # Define a subplot. "211" maps to "2 rows," "1 column," "1st subplot"
 for i in range(len(keys)):
-    if (len(sorted_df[keys[i]].columns) < 4):   # If we have sensor data...
+    if ("Port" in sorted_df[keys[i]].columns.tolist()):   # If we have sensor data...
         color = colors[i]
         marker = markers[i]
         graph_label = "Sensor {0}".format(int(sorted_df[keys[i]]["Port"][0]) + 1)
-    else:                                       # If we have weather data...
+    else:   # If we have weather data...
         color = "red"
         marker = "*"
         graph_label = "CVille"
@@ -390,7 +411,7 @@ modification to each element in the columns containing the data. '''
 
 temps = plt.subplot(212)   # Second of two subplots. This displays below hums
 for i in range(len(keys)):
-    if (len(sorted_df[keys[i]].columns) < 4):
+    if ("Port" in sorted_df[keys[i]].columns.tolist()):
         color = colors[i]
         marker = markers[i]
         graph_label = "Sensor {0}".format(int(sorted_df[keys[i]]["Port"][0]) + 1)
@@ -456,8 +477,8 @@ while True:
                     df = pd.DataFrame([split_line])                            # ...and create a new dataframe out of that line as a list
                     try:
                         if (len(df.columns) > 4):                              # If there are the appropriate number of columns...
-                            if (len(df.columns) > 5):                          # ...and we have weather data...
-                                df.columns = ["Port", "Date", "Time", "Humidity", "Temperature", "Precipitation"]
+                            if ("-" in str(df.iloc[0][0])):                     # ...and we have weather data...
+                                df.columns = ["Date", "Time", "Humidity", "Temperature", "Precipitation"]
                                 df["Temperature"] = df["Temperature"].apply(lambda x: (int(x) - 32) / 1.8)
                                 key = "df{0}".format(0)
                             else:                                              # ...otherwise, we have sensor data
@@ -480,7 +501,7 @@ while True:
         if (switcher == 0):
             stat_lower_bound, stat_upper_bound, stat_title_start, stat_title_end = stat_bounds(date_list, stat_low_index, stat_high_index)
         for i in range(len(keys)):   # This part is basically Parts 6 and 7, just written a little differently
-            if (len(sorted_df[keys[i]].columns) > 3):
+            if ("Precipitation" in sorted_df[keys[i]].columns.tolist()):
                 ax_precip.cla()      # Clear the secondary precipitation axis, too
                 color = "red"
                 marker = "*"
