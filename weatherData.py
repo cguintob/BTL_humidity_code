@@ -137,7 +137,7 @@ while True:
             time.sleep(2 * rest_time)
             print("Ready after 20 seconds of rest.")
             print("\n")
-            sess.headers.update({"User-Agent": random.cohice(user_agents)})
+            sess.headers.update({"User-Agent": random.choice(user_agents)})
             continue
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")

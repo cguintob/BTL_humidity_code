@@ -238,7 +238,7 @@ for f in files:
     try:
         df = pd.read_csv(f, sep = " ", header = None)   # Create a dataframe by reading the contents of the file
         for i in range(len(df.index)):
-            if (len(df.loc[i, :].values.flatten().tolist()) > 5):
+            if ((len(df.loc[i, :].values.flatten().tolist()) > 5) or (len(df.loc[i, :].values.flatten().tolist()) < 5)):
                 df.drop([i], inplace = True)
         ''' The if part of the if-else statement defines the weather data; the else part defines the sensor data. 
         Both parts contain if-else statements---if the dataframe doesn't already exist, define it; if it does, add to it. '''
@@ -476,8 +476,8 @@ while True:
                     split_line = lastLine[i].rstrip("\n").split(" ")           # ...format the line by eliminating the newline character and splitting between spaces...
                     df = pd.DataFrame([split_line])                            # ...and create a new dataframe out of that line as a list
                     try:
-                        if (len(df.columns) > 4):                              # If there are the appropriate number of columns...
-                            if ("-" in str(df.iloc[0][0])):                     # ...and we have weather data...
+                        if (len(df.columns) == 5):                              # If there are the appropriate number of columns...
+                            if ("-" in str(df.iloc[0][0])):                    # ...and we have weather data...
                                 df.columns = ["Date", "Time", "Humidity", "Temperature", "Precipitation"]
                                 df["Temperature"] = df["Temperature"].apply(lambda x: (int(x) - 32) / 1.8)
                                 key = "df{0}".format(0)
