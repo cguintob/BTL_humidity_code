@@ -37,8 +37,7 @@ the revised format (both humidities and temperatures are plotted on the
 same graph  
 `Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project  
 `EXAMPLE_sensor_0.txt` `EXAMPLE_weather.txt` `EXAMPLE_sensor_1.txt` --- Data 
-files taken between 5/24/2024 at 3:23.47 pm and 5/26/2024 at 1:28:29 am in 
-the new format
+files taken in the new format
 
 ### Miscellaneous/Housekeeping
 `README.md` --- Contains information about project and how to use programs  
