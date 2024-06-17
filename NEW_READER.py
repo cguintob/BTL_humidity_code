@@ -37,8 +37,8 @@ colors and markers included in matplotlib.pyplot for ease of definition. '''
 
 lower_time_index = 0    # Factor denoting what fraction from the start date we're including on the graph (cannot be greater than upper_time_index, lower bound: 0)
 upper_time_index = 1    # Same as above, but for end date (cannot be less than lower_time_index, upper bound: 1)
-lower_hum_bound = 30    # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
-upper_hum_bound = 70    # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
+lower_hum_bound = 40    # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
+upper_hum_bound = 60    # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
 lower_temp_bound = 0    # Lower bound on temperature (cannot be greater than upper_temp_bound)
 upper_temp_bound = 30   # Upper bound on temperature (cannot be less than lower_temp_bound)
 stat_low_index = 0      # Factor denoting what fraction from the start date we're including in the statistics (cannot be greater than stat_high_index, lower bound: 0)
@@ -371,9 +371,9 @@ for i in range(len(keys)):
     if ("df{0}".format(0) in keys):
         if ("Weather" not in columns):
             columns.append("Weather")
-    if ("df{0}".format(i + 1) in keys):
-        if ("Sensor {0}".format(i + 1) not in columns):
-            columns.append("Sensor {0}".format(i + 1))
+    if ("df{0}".format(int(sorted_df[keys[i]].iloc[0][0]) + 1) in keys):
+        if ("Sensor {0}".format(int(sorted_df[keys[i]].iloc[0][0]) + 1) not in columns):
+            columns.append("Sensor {0}".format(int(sorted_df[keys[i]].iloc[0][0]) + 1))
 stats = pd.DataFrame(index = ["Humidity", "Temperature"], columns = columns)
 
 hums = plt.subplot(211)   # Define a subplot. "211" maps to "2 rows," "1 column," "1st subplot"
