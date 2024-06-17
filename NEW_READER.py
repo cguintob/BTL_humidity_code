@@ -210,6 +210,12 @@ else:
     print("Use the following format: python NEW_READER.py [datafile1].txt [datafile2].txt [datafile3].txt ...\n")
     print("Can also be used like this: python NEW_READER.py path_to_datafiles/[filename]*")
     sys.exit(1)
+
+lastLine = [None] * len(files)       # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file 
+for i in range(len(files)):          # This for loop initizalizes lastLine to be the last lines of the data files before we do any updating
+    with open(files[i], "r") as f:
+        lines = f.readlines()
+        lastLine[i] = lines[-1]
     
 ''' ================================================================================================================== '''
 ''' ================================================ PART 2: DATAFRAMES ============================================== '''
@@ -462,12 +468,11 @@ printing_stats(stats, stat_title_start, stat_title_end)   # This just prints the
 photo_saver(png_start_date, png_end_date)                 # This saves the graph as a PNG
 plt.show(block = False)                                   # Plot the graph with nonblocking behavior so code can run while it's plotted
 try:
-    plt.pause(30)                                         # Pause the program for 30 seconds before continuing
+    plt.pause(10)                                         # Pause the program for 30 seconds before continuing
 except KeyboardInterrupt:
     print("\nKeyboardInterrupt")
     sys.exit(1)
     
-lastLine = [None] * len(files)   # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file
 start_time = int(time.time())    # This gets the current time and will be used for saving a figure every hour
 
 while True:
@@ -533,8 +538,8 @@ while True:
             photo_saver(png_start_date, png_end_date)
             start_time = end_time
         plt.show(block = False)
-        plt.pause(15)
-        time.sleep(15)
+        plt.pause(5)
+        time.sleep(5)
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
         sys.exit(1)
