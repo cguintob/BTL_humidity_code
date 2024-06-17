@@ -461,8 +461,12 @@ All in all, it works. And I'm glad it does. '''
 printing_stats(stats, stat_title_start, stat_title_end)   # This just prints the statistics dataframe to the screen with nice formatting
 photo_saver(png_start_date, png_end_date)                 # This saves the graph as a PNG
 plt.show(block = False)                                   # Plot the graph with nonblocking behavior so code can run while it's plotted
-plt.pause(30)                                             # Pause the program for 30 seconds before continuing
-
+try:
+    plt.pause(30)                                         # Pause the program for 30 seconds before continuing
+except KeyboardInterrupt:
+    print("\nKeyboardInterrupt")
+    sys.exit(1)
+    
 lastLine = [None] * len(files)   # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file
 start_time = int(time.time())    # This gets the current time and will be used for saving a figure every hour
 
@@ -476,13 +480,13 @@ while True:
                     split_line = lastLine[i].rstrip("\n").split(" ")           # ...format the line by eliminating the newline character and splitting between spaces...
                     df = pd.DataFrame([split_line])                            # ...and create a new dataframe out of that line as a list
                     try:
-                        if (len(df.columns) == 5):                              # If there are the appropriate number of columns...
+                        if (len(df.columns) == 5):                             # If there are the appropriate number of columns...
                             if ("-" in str(df.iloc[0][0])):                    # ...and we have weather data...
                                 df.columns = ["Date", "Time", "Humidity", "Temperature", "Precipitation"]
                                 df["Temperature"] = df["Temperature"].apply(lambda x: (int(x) - 32) / 1.8)
                                 key = "df{0}".format(0)
                             else:                                              # ...otherwise, we have sensor data
-                                df.columns = ["Port", "Date", "Time", "Humidity", "Temperature"]
+                                df.columns =["Port", "Date", "Time", "Humidity", "Temperature"]
                                 key = "df{0}".format(int(df.iloc[0][0]) + 1)
                             df_formatter(df)                                   # Format the dataframe as before
                             sorted_df[key] = pd.concat([sorted_df[key], df])   # Add the dataframe to the appropriate dataframe in sorted_df
