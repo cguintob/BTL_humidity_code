@@ -14,6 +14,18 @@ out, we thought it was a good idea to decouple the weather-data collection
 from the sensor-data collection. '''
 
 ''' ================================================================================================================== '''
+''' ================================================ PART i: VARIABLES =============================================== '''
+''' ================================================================================================================== '''
+
+''' The following are variables used in the program, planted here for easy
+access in case they need to be changed. '''
+
+''' ================================================================================================================== '''
+
+rest_time = 10                                           # This variable tells us how often we want to get weather data. 
+url = "http://wttr.in/Charlottesville?format=%h+%t+%p"   # This is the URL from which we're fetching data.  
+
+''' ================================================================================================================== '''
 ''' ========================================= PART 1: COMMAND-LINE ARGUMENTS ========================================= '''
 ''' ================================================================================================================== '''
 
@@ -107,14 +119,10 @@ from being lost. '''
 
 ''' ================================================================================================================== '''
 
-# This variable tells us how often we want to get weather data.
-rest_time = 10
-
 while True:
     try:
         day = date.today()
         cur_time = datetime.datetime.now().strftime("%H:%M:%S")   # Named "cur_time" for "current time" so it didn't conflict with time module
-        url = "http://wttr.in/Charlottesville?format=%h+%t+%p"
         sess.headers.update({"User-Agent": random.choice(user_agents)})
         try:
             res = sess.get(url)
@@ -135,7 +143,7 @@ while True:
         except requests.exceptions.ConnectionError:
             print("Raising requests.exceptions.ConnectionError")
             time.sleep(2 * rest_time)
-            print("Ready after 20 seconds of rest.")
+            print("Ready after {0} seconds of rest.".format(2 * rest_time))
             print("\n")
             sess.headers.update({"User-Agent": random.choice(user_agents)})
             continue

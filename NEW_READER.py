@@ -6,9 +6,9 @@ import matplotlib.dates as mdates     # This is used for plotting the x-ticks wi
 from collections import OrderedDict   # This is necessary for ordering the dataframes chronologically.
 import time                           # This is necessary for pausing the program before continuing its execution (see Part 8).
 import datetime                       # This is necessary for determining whether the files are weather data or sensor data.
-import warnings                       # This is used to disable warning messages, specifically FutureWarning messages when used on Python 3 and above.
+import warnings                       # This is used to disable warning messages, specifically FutureWarning and UserWarning messages.
 warnings.simplefilter(action = "ignore", category = FutureWarning)
-warnings.filterwarnings("ignore") 
+warnings.simplefilter(action = "ignore", category = UserWarning)
 import pandas as pd                   # This creates the dataframes used for plotting and other functionalities.
 
 ''' ================================================================================================================== '''
