@@ -1,6 +1,10 @@
-import sys                            # This allows the user to enter command-line arguments and shuts down the program if things go wrong.# 
+import sys                            # This allows the user to enter command-line arguments and shuts down the program if things go wrong. 
+if (sys.version_info[0] == 3):        # If the machine has Python 3 and above, import tkinter; if not, import Tkinter (they changed the name).
+    import tkinter as tk
+else:
+    import Tkinter as tk
 import matplotlib                     # I messed up the program playing with (installing) backend services and now I must manually set the backend this way. Whoops.
-matplotlib.use("agg")
+matplotlib.use("tkagg")               # This is an interactive backend used with tkinter.
 import matplotlib.pyplot as plt       # This creates the plots and their characteristics.
 import matplotlib.dates as mdates     # This is used for plotting the x-ticks with datetimes.
 from collections import OrderedDict   # This is necessary for ordering the dataframes chronologically.
