@@ -2,7 +2,6 @@ import datetime             # Contains information about the date and time of ei
 from datetime import date   # Module in "datetime" that specifically accesses the date
 import sys                  # Allows the user to use command line arguments
 import requests             # Allows the user to get information from a url
-import random               # Necessary for changing the user-agent used for fetching WTTR data
 import time                 # Necessary for addressing requests.exceptions.ConnectionErrors
 
 ''' ================================================================================================================== '''
@@ -23,7 +22,7 @@ access in case they need to be changed. '''
 ''' ================================================================================================================== '''
 
 rest_time = 10                                           # This variable tells us how often we want to get weather data. 
-url = "http://wttr.in/Charlottesville?format=%h+%t+%p"   # This is the URL from which we're fetching data.  
+url = "http://wttr.in/Charlottesville?format=%h+%t+%p"   # This is the URL from which we're fetching data.
 
 ''' ================================================================================================================== '''
 ''' ========================================= PART 1: COMMAND-LINE ARGUMENTS ========================================= '''
@@ -67,34 +66,10 @@ defines a prefix for which the adapter is to be used (any website with this
 prefix will use the adapter. This code was implemented 4/30/2024.
 
 UPDATE 5/3/2024: I added the retry line because my code timed out after about 
-three days, which is longer than before, but not optimal. 
-
-UPDATE 6/14/2024: My code was STILL timing out (specifically refusing to 
-connect), so I added a list of User_Agents that are chosen by the session at 
-random (using random.choice()) from which the request will appear to have been. 
-Some of the User-Agents in the list are duplicated at random so that some sites 
-are visited more often than others. '''
+three days, which is longer than before, but not optimal. ''' 
 
 ''' ================================================================================================================== '''
 
-user_agents = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
-               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15",
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.2420.81",
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0",
-               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-               "Mozilla/5.0 (X11; Linux i686; rv:124.0) Gecko/20100101 Firefox/124.0",
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
-               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.4; rv:124.0) Gecko/20100101 Firefox/124.0",
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
-               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15",
-               "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0",
-               "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-               "Mozilla/5.0 (X11; Linux i686; rv:124.0) Gecko/20100101 Firefox/124.0",
-               "Mozilla/5.0 (X11; Linux i686; rv:124.0) Gecko/20100101 Firefox/124.0"]
 sess = requests.Session()
 retry = requests.packages.urllib3.util.retry.Retry(total = 5, backoff_factor = 0.1, status_forcelist = [500, 502, 503, 504])
 adapter = requests.adapters.HTTPAdapter(max_retries = retry)
@@ -123,7 +98,6 @@ while True:
     try:
         day = date.today()
         cur_time = datetime.datetime.now().strftime("%H:%M:%S")   # Named "cur_time" for "current time" so it didn't conflict with time module
-        sess.headers.update({"User-Agent": random.choice(user_agents)})
         try:
             res = sess.get(url)
             converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"})   # Replaces all these delimiters with ""
@@ -145,7 +119,6 @@ while True:
             time.sleep(2 * rest_time)
             print("Ready after {0} seconds of rest.".format(2 * rest_time))
             print("\n")
-            sess.headers.update({"User-Agent": random.choice(user_agents)})
             continue
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt")
