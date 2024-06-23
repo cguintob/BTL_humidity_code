@@ -637,7 +637,7 @@ printing_stats(stats, stat_title_start, stat_title_end)   # This just prints the
 photo_saver(png_start_date, png_end_date)                 # This saves the graph as a PNG
 plt.show(block = False)                                   # Plot the graph with nonblocking behavior so code can run while it's plotted
 try:
-    plt.pause(10)                                         # Pause the program for 30 seconds before continuing
+    plt.pause(10)                                         # Pause the program for 10 seconds before continuing
 except KeyboardInterrupt:
     print("\nKeyboardInterrupt")
     sys.exit(1)
