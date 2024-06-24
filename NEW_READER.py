@@ -41,17 +41,17 @@ colors and markers included in matplotlib.pyplot for ease of definition. '''
 T = True
 F = False
 
-lower_hum_bound = 0                  # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
-upper_hum_bound = 100                # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
+lower_hum_bound = 35                 # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
+upper_hum_bound = 90                 # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
 lower_temp_bound = 0                 # Lower bound on temperature (cannot be greater than upper_temp_bound)
 upper_temp_bound = 30                # Upper bound on temperature (cannot be less than lower_temp_bound)
-assigned_start = F                   # Boolean that determines whether the user wants to specify the start date for plotting
+assigned_start = T                   # Boolean that determines whether the user wants to specify the start date for plotting
 assigned_end = F                     # Boolean that determines whether the user wants to specify the end date for plotting
-start_date = "2024-05-21 18:19:54"   # Assigned start date for plotting (this is a placeholder date; will get reassigned if assigned_start == False)
+start_date = "2024-06-21 02:00:00"   # Assigned start date for plotting (this is a placeholder date; will get reassigned if assigned_start == False)
 end_date = "2024-05-26 00:02:00"     # Assigned end date for plotting (same as above; wil get reassigned if assigned_end == False)
-assign_stat_start = F                # Boolean like "assigned_start," but for calculating statistics
+assign_stat_start = T                # Boolean like "assigned_start," but for calculating statistics
 assign_stat_end = F                  # Boolean like "assigned_end," but for calculating statistics
-stat_start = "2024-05-20 02:12:12"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
+stat_start = "2024-06-21 02:00:00"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
 stat_end = "2024-05-26 00:02:00"     # Assigned end date for statistics (will get reassigned if assign_stat_end == False)
 update_stats = F                     # Boolean telling the program whether to continue printing statistics to the screen (used mainly for updating/non-updating files)
 
@@ -398,7 +398,7 @@ for f in files:
             df.drop(df.index[df.notnull().all(axis = 1)].tolist(), inplace = True)
             df.dropna(axis = 1, how = "all", inplace = True)
         df.dropna(axis = 0, inplace = True)                                         # This drops all the rows that aren't complete
-        if ((len(df.columns) == 6) and (isinstance(df.iloc[0][1], str) == True)):   # This if statement removes the port from the old version of weather data files
+        if ((len(df.columns) == 6) and ("-" in str(df.iloc[0][1]))):                # This if statement removes the port from the old version of weather data files
             df.drop(columns = df.columns[0], axis = 1, inplace = True)
         df.columns = [0, 1, 2, 3, 4]
         if ("-" in str(df.iloc[0][0])):                                             # Denotes weather data
@@ -409,6 +409,7 @@ for f in files:
                 unsorted_df["df{0}".format(0)] = pd.concat([unsorted_df["df{0}".format(0)], df])
         else:
             df.rename(columns = {0: "Port", 1: "Date",  2: "Time", 3: "Relative Humidity", 4: "Temperature"}, inplace = True)
+            df.drop(df[~(df["Relative Humidity"] > 100)], inplace = True)
             if ("df{0}".format(int(df.iloc[0][0]) + 1) not in list(unsorted_df.keys())):
                 unsorted_df["df{0}".format(int(df.iloc[0][0]) + 1)] = df
             else:
