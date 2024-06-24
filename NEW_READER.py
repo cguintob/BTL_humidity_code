@@ -409,7 +409,7 @@ for f in files:
                 unsorted_df["df{0}".format(0)] = pd.concat([unsorted_df["df{0}".format(0)], df])
         else:
             df.rename(columns = {0: "Port", 1: "Date",  2: "Time", 3: "Relative Humidity", 4: "Temperature"}, inplace = True)
-            df.drop(df[~(df["Relative Humidity"] > 100)], inplace = True)
+            df.drop(df[~(df["Relative Humidity"].astype(float) > 100)], inplace = True)
             if ("df{0}".format(int(df.iloc[0][0]) + 1) not in list(unsorted_df.keys())):
                 unsorted_df["df{0}".format(int(df.iloc[0][0]) + 1)] = df
             else:
