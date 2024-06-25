@@ -1,8 +1,10 @@
 import sys                            # This allows the user to enter command-line arguments and shuts down the program if things go wrong. 
 if (sys.version_info[0] == 3):        # If the machine has Python 3 and above, import tkinter; if not, import Tkinter (they changed the name).
     import tkinter as tk
+    file_not_found_error = FileNotFoundError
 else:
     import Tkinter as tk
+    file_not_found_error = IOError
 import matplotlib                     # I messed up the program playing with (installing) backend services and now I must manually set the backend this way. Whoops.
 matplotlib.use("tkagg")               # This is an interactive backend used with tkinter.
 import matplotlib.pyplot as plt       # This creates the plots and their characteristics.
@@ -41,25 +43,25 @@ colors and markers included in matplotlib.pyplot for ease of definition. '''
 T = True
 F = False
 
-lower_hum_bound = 0                  # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
-upper_hum_bound = 100                # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
+lower_hum_bound = 35                 # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
+upper_hum_bound = 90                 # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
 lower_temp_bound = 0                 # Lower bound on temperature (cannot be greater than upper_temp_bound)
 upper_temp_bound = 40                # Upper bound on temperature (cannot be less than lower_temp_bound)
 assigned_start = F                   # Boolean that determines whether the user wants to specify the start date for plotting
 assigned_end = F                     # Boolean that determines whether the user wants to specify the end date for plotting
-start_date = "2024-06-17 10:00:00"   # Assigned start date for plotting (this is a placeholder date; will get reassigned if assigned_start == False)
-end_date = "2024-06-17 12:00:00"     # Assigned end date for plotting (same as above; wil get reassigned if assigned_end == False)
+start_date = "2024-06-25 01:00:00"   # Assigned start date for plotting (this is a placeholder date; will get reassigned if assigned_start == False)
+end_date = "2024-06-25 09:00:00"     # Assigned end date for plotting (same as above; wil get reassigned if assigned_end == False)
 assign_stat_start = F                # Boolean like "assigned_start," but for calculating statistics
 assign_stat_end = F                  # Boolean like "assigned_end," but for calculating statistics
-stat_start = "2024-06-17 11:00:00"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
-stat_end = "2024-06-17 15:00:00"     # Assigned end date for statistics (will get reassigned if assign_stat_end == False)
+stat_start = "2024-06-25 02:00:00"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
+stat_end = "2024-06-25 09:00:00"     # Assigned end date for statistics (will get reassigned if assign_stat_end == False)
 update_stats = F                     # Boolean telling the program whether to continue printing statistics to the screen (used mainly for updating/non-updating files)
 
 n_desired_ticks = 10                              # Sometimes there are 11 ticks shown on the x-axis, but ultimately, we want constant and evenly-spaced ticks
 colors = ["cyan", "green", "yellow", "magenta"]   # List of colors for plotting
 markers = ["x", "v", "^", ".", ","]               # List of markers for plotting
-markersize = 5                                    # Size of markers plotted
-linewidth = 2                                     # Width of lines plotted
+markersize = 3                                    # Size of markers plotted
+linewidth = 1                                     # Width of lines plotted
 
 ''' ================================================================================================================== '''
 ''' =========================================== PART ii: HELPER FUNCTIONS ============================================ '''
@@ -113,6 +115,26 @@ def help_func():
     print("\ta) Not closing plot before killing program will cause it to freeze on screen\n") 
     sys.exit(1)
 
+
+''' This function is called to format data files that are in the old format. 
+For weather data, this means that a sixth column is included before the date 
+column; for sensor data, this means that an index is still included as the 
+first column and not the port number. The function is always called but 
+won't do anything if the file is already in the correct format. A caveat of 
+this function is that it will only work on specific old sensor-data files, 
+namely those that have an indication in their title about which port number 
+was used. If there is no indication, then it cannot be used on those files. 
+This function was implemented 6/25/2024. '''
+def old_file_formatter(dataframe, infile):
+    if ("-" in str(dataframe.iloc[0][1])):
+        if (len(dataframe.columns) == 6):                                                                                              # Old weather data
+            dataframe.drop(columns = dataframe.columns[0], axis = 1, inplace = True)
+        elif ((dataframe[0].astype(int).tolist()[len(dataframe[0].tolist()) - 1] - dataframe[0].astype(int).tolist()[0]) != 0):        # Old sensor data (good titles)
+            if ((("first" in str(infile)) or ("1st" in str(infile))) and (("sens" in str(infile)) or ("sensor" in str(infile)))):
+                dataframe[0] = dataframe[0].astype(int) - dataframe[0].astype(int)
+            elif ((("second" in str(infile)) or ("2nd" in str(infile))) and (("sens" in str(infile)) or ("sensor" in str(infile)))):
+                dataframe[0] = dataframe[0].astype(int) - dataframe[0].astype(int) + 1
+    
 ''' This function, implemented 6/20/2024, is meant to calculate the absolute 
 humidity in an environment based on the sensor's relative humidity and 
 temperature readings. If we can find the absolute humidity given the relative 
@@ -136,18 +158,19 @@ def abs_hum_calc(hum_ser, temp_ser):
 
 # This function formats and sorts the columns in a dataframe. I must include "inplace = True" if I want the modifications to save.
 def df_formatter(dataframe):
-    dataframe["Date"] = dataframe["Date"].astype(str) + " " + dataframe["Time"].astype(str)   # Modify elements in "Date" column by combining elements in columns "Date" and "Time"
-    dataframe.rename(columns = {"Date": "Date and Time"}, inplace = True)                     # Rename column "Date" to "Date and Time"
-    dataframe["Date and Time"] = pd.to_datetime(dataframe["Date and Time"])                   # Change elements in "Date and Time" to Pandas datetime objects
-    dataframe.drop("Time", axis = 1, inplace = True)                                          # Remove column "Time"
-    dataframe.sort_values(by = "Date and Time", inplace = True)                               # Sort datetime objects chronologically
-    dataframe.set_index(["Date and Time"], inplace = True)                                    # Make column "Date and Time" the new index of the dataframe
-    dataframe.dropna(inplace = True)                                                          # Removes any row where NaN appears
-    if ("Port" in dataframe.columns.tolist()):                                                # Defines a column called "Absolute Humidity" for sensor data only
+    dataframe["Date"] = dataframe["Date"].astype(str) + " " + dataframe["Time"].astype(str)        # Modify elements in "Date" column by combining elements in columns "Date" and "Time"
+    dataframe.rename(columns = {"Date": "Date and Time"}, inplace = True)                          # Rename column "Date" to "Date and Time"
+    dataframe["Date and Time"] = pd.to_datetime(dataframe["Date and Time"], errors = "coerce")     # Change elements in "Date and Time" to Pandas datetime objects
+    dataframe.drop(dataframe[dataframe["Date and Time"].isnull() == True].index, inplace = True)   # Remove any NaT values
+    dataframe.drop("Time", axis = 1, inplace = True)                                               # Remove column "Time"
+    dataframe.sort_values(by = "Date and Time", inplace = True)                                    # Sort datetime objects chronologically
+    dataframe.set_index(["Date and Time"], inplace = True)                                         # Make column "Date and Time" the new index of the dataframe
+    dataframe.dropna(inplace = True)                                                               # Removes any row where NaN appears
+    if ("Port" in dataframe.columns.tolist()):                                                     # Defines a column called "Absolute Humidity" for sensor data only
         dataframe["Absolute Humidity"] = abs_hum_calc(dataframe["Relative Humidity"], dataframe["Temperature"])
-    dataframe["Relative Humidity"] = dataframe["Relative Humidity"].astype(float)             # Typecasts all the relative humidity values as floats
-    dataframe["Temperature"] = dataframe["Temperature"].astype(float)                         # Typecasts all the temperature values as floats
-    if ("Precipitation" in dataframe.columns.tolist()):                                       # Defines a column called "Precipitation" for weather data only
+    dataframe["Relative Humidity"] = dataframe["Relative Humidity"].astype(float)                  # Typecasts all the relative humidity values as floats
+    dataframe["Temperature"] = dataframe["Temperature"].astype(float)                              # Typecasts all the temperature values as floats
+    if ("Precipitation" in dataframe.columns.tolist()):                                            # Defines a column called "Precipitation" for weather data only
         dataframe["Precipitation"] = dataframe["Precipitation"].astype(float)
     
 # This function defines the start date for plotting by comparing the corresponding indices in the dataframes in the dictionary.
@@ -359,9 +382,13 @@ else:
     
 lastLine = [None] * len(files)       # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file 
 for i in range(len(files)):          # This for loop initizalizes lastLine to be the last lines of the data files before we do any updating
-    with open(files[i], "r") as f:
-        lines = f.readlines()
-        lastLine[i] = lines[-1]
+    try:
+        with open(files[i], "r") as f:
+            lines = f.readlines()
+            lastLine[i] = lines[-1]
+    except file_not_found_error:
+        print("Couldn't find file. Choose a file that is in the directory and has data in it.")
+        sys.exit(1)
     
 ''' ================================================================================================================== '''
 ''' ================================================ PART 2: DATAFRAMES ============================================== '''
@@ -398,11 +425,10 @@ for f in files:
             df.drop(df.index[df.notnull().all(axis = 1)].tolist(), inplace = True)
             df.dropna(axis = 1, how = "all", inplace = True)
         df.dropna(axis = 0, inplace = True)                                         # This drops all the rows that aren't complete
-        if ((len(df.columns) == 6) and ("-" in str(df.iloc[0][1]))):                # This if statement removes the port from the old version of weather data files
-            df.drop(columns = df.columns[0], axis = 1, inplace = True)
+        old_file_formatter(df, f)                                                   # This formats any files that are in the old format to the new format
         df.columns = [0, 1, 2, 3, 4]
         if ("-" in str(df.iloc[0][0])):                                             # Denotes weather data
-            df.rename(columns = {0: "Date", 1: "Time",  2: "Relative Humidity", 3: "Temperature", 4: "Precipitation"}, inplace = True)
+            df.rename(columns = {0: "Date", 1: "Time",  2: "Relative Humidity", 3: "Temperature", 4: "Precipitation"}, inplace = True) 
             if ("df{0}".format(0) not in list(unsorted_df.keys())):
                 unsorted_df["df{0}".format(0)] = df
             else:
@@ -414,7 +440,7 @@ for f in files:
                 unsorted_df["df{0}".format(int(df.iloc[0][0]) + 1)] = df
             else:
                 unsorted_df["df{0}".format(int(df.iloc[0][0]) + 1)] = pd.concat([unsorted_df["df{0}".format(int(df.iloc[0][0]) + 1)], df])
-    except FileNotFoundError:
+    except file_not_found_error:
         print("Couldn't find file. Choose a file that is in the directory and has data in it.")
         sys.exit(1)
         
@@ -562,6 +588,8 @@ for i in range(len(keys)):
         ax_hum = sorted_df[keys[i]]["Relative Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label, lw = linewidth, markersize = markersize)
     else:
         sorted_df[keys[i]]["Relative Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label, lw = linewidth, markersize = markersize)
+    ax_hum.hlines(y = 60, xmin = start_date, xmax = end_date, colors = "y", lw = 1)
+    ax_hum.hlines(y = 40, xmin = start_date, xmax = end_date, colors = "y", lw = 1)
     new_stat_start, new_stat_end = stat_date_formatter(stat_start, stat_end, sorted_df[keys[i]])
     if (new_stat_start != new_stat_end):
         statistics_placer(stats, 0, i, sorted_df[keys[i]]["Relative Humidity"], new_stat_start, new_stat_end)
