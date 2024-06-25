@@ -90,7 +90,11 @@ It's important to note that I open and close the data file each time I add a
 new set of measurements (hence why I use "a" instead of "w"). I did this in 
 case we need to stop data collection but didn't want to lose our data. By 
 continuously opening and closing the file, we save the data, preventing it 
-from being lost. '''
+from being lost. 
+
+UPDATE: As of 6/24/2024, WTTR apparently received over 1M requests in one day, 
+causing it to lose data storage. So, I implemented an if statement that will 
+cause the program to sleep for an hour to let it reset. '''
 
 ''' ================================================================================================================== '''
 
@@ -101,6 +105,12 @@ while True:
         try:
             res = sess.get(url)
             converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"})   # Replaces all these delimiters with ""
+            if ("Unknown location" in converted_string):
+                print("WTTR had too many requests. Let's let it reset. Check back in an hour.")
+                time.sleep(3600)
+                print("Ready after an hour of rest.")
+                print("\n")
+                continue
             weather_data = open(file1, "a")
             weather_data.write(str(day))
             weather_data.write(" ")
