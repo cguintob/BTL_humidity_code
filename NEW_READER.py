@@ -41,16 +41,16 @@ colors and markers included in matplotlib.pyplot for ease of definition. '''
 T = True
 F = False
 
-lower_hum_bound = 35                 # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
-upper_hum_bound = 65                 # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
+lower_hum_bound = 0                  # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
+upper_hum_bound = 100                # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
 lower_temp_bound = 0                 # Lower bound on temperature (cannot be greater than upper_temp_bound)
 upper_temp_bound = 40                # Upper bound on temperature (cannot be less than lower_temp_bound)
-assigned_start = T                   # Boolean that determines whether the user wants to specify the start date for plotting
-assigned_end = T                     # Boolean that determines whether the user wants to specify the end date for plotting
+assigned_start = F                   # Boolean that determines whether the user wants to specify the start date for plotting
+assigned_end = F                     # Boolean that determines whether the user wants to specify the end date for plotting
 start_date = "2024-06-17 10:00:00"   # Assigned start date for plotting (this is a placeholder date; will get reassigned if assigned_start == False)
 end_date = "2024-06-17 12:00:00"     # Assigned end date for plotting (same as above; wil get reassigned if assigned_end == False)
-assign_stat_start = T                # Boolean like "assigned_start," but for calculating statistics
-assign_stat_end = T                  # Boolean like "assigned_end," but for calculating statistics
+assign_stat_start = F                # Boolean like "assigned_start," but for calculating statistics
+assign_stat_end = F                  # Boolean like "assigned_end," but for calculating statistics
 stat_start = "2024-06-17 11:00:00"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
 stat_end = "2024-06-17 15:00:00"     # Assigned end date for statistics (will get reassigned if assign_stat_end == False)
 update_stats = F                     # Boolean telling the program whether to continue printing statistics to the screen (used mainly for updating/non-updating files)
@@ -414,7 +414,7 @@ for f in files:
                 unsorted_df["df{0}".format(int(df.iloc[0][0]) + 1)] = df
             else:
                 unsorted_df["df{0}".format(int(df.iloc[0][0]) + 1)] = pd.concat([unsorted_df["df{0}".format(int(df.iloc[0][0]) + 1)], df])
-    except:
+    except FileNotFoundError:
         print("Couldn't find file. Choose a file that is in the directory and has data in it.")
         sys.exit(1)
         
