@@ -128,6 +128,7 @@ will *not* be registered until you compile and upload the script using the
 Arduino IDE. Since we're not changing `aht0.ino` enough for this to occur, I
 am not worrying too hard about it.
 
+
 ## USING `sensorData.py`
 `sensorData.py` is used with the following command:
 
@@ -198,7 +199,8 @@ In addition, `NEW_READER.py` will also display the mean and standard
 deviation of the humidities and temperatures from each dataframe to the
 screen. There is an option that allows the user to choose whether they want
 to display these statistics every 10 seconds (used mainly for updating data
-files).
+files). The program also calculates and displays the absolute humidity values
+based on the relative humidity and temperature readings.
 
 The nice thing about `NEW_READER.py` is that it can display the data as it 
 is being taken. This was implemented 6/8/2024 -- 6/10/2024 and allows the user
