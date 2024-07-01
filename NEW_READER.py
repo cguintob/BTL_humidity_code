@@ -43,7 +43,7 @@ colors and markers included in matplotlib.pyplot for ease of definition. '''
 T = True
 F = False
 
-lower_hum_bound = 35                 # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
+lower_hum_bound = 20                 # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
 upper_hum_bound = 90                 # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
 lower_temp_bound = 0                 # Lower bound on temperature (cannot be greater than upper_temp_bound)
 upper_temp_bound = 40                # Upper bound on temperature (cannot be less than lower_temp_bound)
@@ -55,13 +55,16 @@ assign_stat_start = F                # Boolean like "assigned_start," but for ca
 assign_stat_end = F                  # Boolean like "assigned_end," but for calculating statistics
 stat_start = "2024-06-25 02:00:00"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
 stat_end = "2024-06-25 09:00:00"     # Assigned end date for statistics (will get reassigned if assign_stat_end == False)
-update_stats = F                     # Boolean telling the program whether to continue printing statistics to the screen (used mainly for updating/non-updating files)
+update_stats = T                     # Boolean telling the program whether to continue printing statistics to the screen (used mainly for updating/non-updating files)
 
 n_desired_ticks = 10                              # Sometimes there are 11 ticks shown on the x-axis, but ultimately, we want constant and evenly-spaced ticks
 colors = ["cyan", "green", "yellow", "magenta"]   # List of colors for plotting
 markers = ["x", "v", "^", ".", ","]               # List of markers for plotting
 markersize = 3                                    # Size of markers plotted
 linewidth = 1                                     # Width of lines plotted
+
+optimal_high = 60   # This is the upper limit of the optimal humidity range (used in line_plotter)
+optimal_low = 40    # This is the lower limit of the optimal humidity range (used in line_plotter)
 
 ''' ================================================================================================================== '''
 ''' =========================================== PART ii: HELPER FUNCTIONS ============================================ '''
@@ -114,7 +117,6 @@ def help_func():
     print("5) Exit out of program by closing plot and typing \"Ctrl-c\"")
     print("\ta) Not closing plot before killing program will cause it to freeze on screen\n") 
     sys.exit(1)
-
 
 ''' This function is called to format data files that are in the old format. 
 For weather data, this means that a sixth column is included before the date 
@@ -304,6 +306,11 @@ def stat_date_formatter(start, end, dataframe):
         new_start = start
         new_end = end
     return (new_start, new_end)
+
+# This function plots the optimal range for humidities.
+def line_plotter(axis, line_high, line_low, start, end):
+    axis.hlines(y = line_high, xmin = start, xmax = end, colors = "y", lw = 1)
+    axis.hlines(y = line_low, xmin = start, xmax = end, colors = "y", lw = 1)
 
 # This function defines the elements of the statistics dataframe printed to the screen.
 def statistics_placer(stat_df, num, index, series, start, end):
@@ -588,8 +595,7 @@ for i in range(len(keys)):
         ax_hum = sorted_df[keys[i]]["Relative Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label, lw = linewidth, markersize = markersize)
     else:
         sorted_df[keys[i]]["Relative Humidity"].plot(rot = 45, color = color, marker = marker, label = graph_label, lw = linewidth, markersize = markersize)
-    ax_hum.hlines(y = 60, xmin = start_date, xmax = end_date, colors = "y", lw = 1)
-    ax_hum.hlines(y = 40, xmin = start_date, xmax = end_date, colors = "y", lw = 1)
+    line_plotter(ax_hum, optimal_high, optimal_low, start_date, end_date)
     new_stat_start, new_stat_end = stat_date_formatter(stat_start, stat_end, sorted_df[keys[i]])
     if (new_stat_start != new_stat_end):
         statistics_placer(stats, 0, i, sorted_df[keys[i]]["Relative Humidity"], new_stat_start, new_stat_end)
@@ -730,6 +736,7 @@ while True:
             sorted_df[keys[i]]["Temperature"] = sorted_df[keys[i]]["Temperature"].astype(float)
             sorted_df[keys[i]]["Relative Humidity"].plot(rot = 45, ax = ax_hum, color = color, marker = marker, label = label, lw = linewidth, markersize = markersize)
             sorted_df[keys[i]]["Temperature"].plot(rot = 45, ax = ax_temp, color = color, marker = marker, label = label, lw = linewidth, markersize = markersize)
+            line_plotter(ax_hum, optimal_high, optimal_low, start_date, end_date)
             if (update_stats == True):
                 new_stat_start, new_stat_end = stat_date_formatter(stat_start, stat_end, sorted_df[keys[i]])
                 if (new_stat_start != new_stat_end):
