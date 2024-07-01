@@ -4,7 +4,7 @@ if (sys.version_info[0] == 3):        # If the machine has Python 3 and above, i
     file_not_found_error = FileNotFoundError
 else:
     import Tkinter as tk
-    file_not_found_error = IOError
+    file_not_found_error = IOError    # NOTE: "FileNotFoundError" is written as "IOError" on Python 2, so I define a variable for the error depending on the version.
 import matplotlib                     # I messed up the program playing with (installing) backend services and now I must manually set the backend this way. Whoops.
 matplotlib.use("tkagg")               # This is an interactive backend used with tkinter.
 import matplotlib.pyplot as plt       # This creates the plots and their characteristics.
@@ -373,7 +373,7 @@ files = []
 if (len(sys.argv) != 1):
     if ((len(sys.argv) == 2) and (sys.argv[1] == "HELP")):
         help_func()
-    for i in range(1, len(sys.argv)):         # I defined the range this way so that the i in the for loop and the i index for the system arguments matched.
+    for i in range(1, len(sys.argv)):        # I defined the range this way so that the i in the for loop and the i index for the system arguments matched.
         if (sys.argv[i].endswith(".txt")):
             files.append(sys.argv[i])
         else:
@@ -387,8 +387,8 @@ else:
     print("If you need help in using this program or are running into issues, type \"python NEW_READER.py HELP\" for usage.")
     sys.exit(1)
     
-lastLine = [None] * len(files)       # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file 
-for i in range(len(files)):          # This for loop initizalizes lastLine to be the last lines of the data files before we do any updating
+lastLine = [None] * len(files)   # Initialize a list of length len(files), all with the value None. This list is used for collecting the last lines of each data file 
+for i in range(len(files)):      # This for loop initizalizes lastLine to be the last lines of the data files before we do any updating
     try:
         with open(files[i], "r") as f:
             lines = f.readlines()
@@ -426,15 +426,15 @@ doesn't already exist, define it; if it does, add to it. '''
 unsorted_df = {}
 for f in files:
     try:
-        df = pd.read_csv(f, sep = "\r\n", header = None, engine = "python")         # Create a dataframe by reading the contents of the file
+        df = pd.read_csv(f, sep = "\r\n", header = None, engine = "python")          # Create a dataframe by reading the contents of the file
         df = df[0].str.split(" ", expand = True)
-        while ((df.isnull().values.any() == True) and (df.shape[1] > 6)):           # This gets rid of any rows that are too long
+        while ((df.isnull().values.any() == True) and (df.shape[1] > 6)):            # This gets rid of any rows that are too long
             df.drop(df.index[df.notnull().all(axis = 1)].tolist(), inplace = True)
             df.dropna(axis = 1, how = "all", inplace = True)
-        df.dropna(axis = 0, inplace = True)                                         # This drops all the rows that aren't complete
-        old_file_formatter(df, f)                                                   # This formats any files that are in the old format to the new format
+        df.dropna(axis = 0, inplace = True)                                          # This drops all the rows that aren't complete
+        old_file_formatter(df, f)                                                    # This formats any files that are in the old format to the new format
         df.columns = [0, 1, 2, 3, 4]
-        if ("-" in str(df.iloc[0][0])):                                             # Denotes weather data
+        if ("-" in str(df.iloc[0][0])):                                              # Denotes weather data
             df.rename(columns = {0: "Date", 1: "Time",  2: "Relative Humidity", 3: "Temperature", 4: "Precipitation"}, inplace = True) 
             if ("df{0}".format(0) not in list(unsorted_df.keys())):
                 unsorted_df["df{0}".format(0)] = df
@@ -502,7 +502,7 @@ for i in range(len(keys)):
 start_date, end_date = date_assigner(start_date, end_date, assigned_start, assigned_end, keys, sorted_df)
 stat_start, stat_end = date_assigner(stat_start, stat_end, assign_stat_start, assign_stat_end, keys, sorted_df)
 
-date_list = pd.date_range(start_date, end_date, freq = "s")       # Pandas date range from start_date to end_date with a frequencty of every second
+date_list = pd.date_range(start_date, end_date, freq = "s")   # Pandas date range from start_date to end_date with a frequencty of every second
 
 ''' ================================================================================================================== '''
 ''' ============================================ PART 5: REVISTING BOUNDS ============================================ '''
@@ -575,6 +575,7 @@ abs_hum_definer = False                                   # This boolean helps t
 hums = plt.subplot(211)                                   # Define a subplot. "211" maps to "2 rows," "1 column," "1st subplot"
 for i in range(len(keys)):
     if ("Port" in sorted_df[keys[i]].columns.tolist()):   # If we have sensor data...
+        sensor_checker = True
         color = colors[i]
         marker = markers[i]
         graph_label = "Sensor {0}".format(int(sorted_df[keys[i]]["Port"][0]) + 1)

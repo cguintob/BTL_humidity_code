@@ -23,8 +23,8 @@ room, and sends information to serial port
 ### Python Scripts
 `sensorData.py` --- Takes sensor data from serial port and writes it to data 
 file
-`weatherData.py` --- Fetches weather data from Charlottesville using WTTR and writes it to 
-separate data file  
+`weatherData.py` --- Fetches weather data from Charlottesville using WTTR and
+writes it to separate data file  
 `NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
 arbitrary number of data files (in a new format) in any order and can plot 
 updating data
@@ -155,6 +155,9 @@ running the following command:
 The user will then be prompted to enter their password. After that is entered, 
 the program should be freely usable.
 
+NOTE: In some systems, you'll need to replace `python` with `python3`. This
+goes for all the commands (for here, I'll use `python`).
+
 
 ## USING `weatherData.py`
 This works the same as `sensorData.py`, only not as a root user:
@@ -191,10 +194,26 @@ combination of sensor and weather data, across the same or differing time
 periods for each. The files can be passed in any order to prevent mistakes in 
 plotting. As long as at least one file is passed, the program will plot it.
 
+In addition, `NEW_READER.py` will also display the mean and standard
+deviation of the humidities and temperatures from each dataframe to the
+screen. There is an option that allows the user to choose whether they want
+to display these statistics every 10 seconds (used mainly for updating data
+files).
+
 The nice thing about `NEW_READER.py` is that it can display the data as it 
-is being taken and will only stop plotting if all the data files have finished 
-updating. This was implemented 6/8/2024 -- 6/10/2024 and allows the user to see 
-the data as it is updating and make decisions about where to go from there.
+is being taken. This was implemented 6/8/2024 -- 6/10/2024 and allows the user
+to see the data as it is updating and make decisions about where to go from
+there. Further updates have allowed the user to be able to change the ranges
+of the humidity and temperature graphs, choose whether they want to use a
+specific date range for both plotting and statistics (and if so, denote the
+start and/or end dates of the range), choose whether they want the statistics
+to update, and choose various attributes about the plots. It makes using the
+program very user-friendly.
+
+Lastly, the user can type the following to get a list of tips for using the
+program:
+
+`python NEW_READER.py HELP`
 
 
 ## SUMMARY
