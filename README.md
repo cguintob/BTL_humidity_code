@@ -31,10 +31,11 @@ updating data
 
 ### Data Files, Plots, and Other Results
 `EXAMPLE_hums_graph.png` `EXAMPLE_temps_graph.png` --- Example graphs in the 
-new format 
-`2024-06-06---17:53:43_to_2024-06-08---06:52:38.png` --- Example graph in 
-the revised format (both humidities and temperatures are plotted on the 
-same graph  
+newer format  
+`2024-07-01_at_10:39:43_to_2024-07-02_at_12:38:05.png` --- Example graph in 
+the newest format (both humidities and temperatures are plotted on the 
+same graph with precipitation on temperature subplot and absolute humidity
+on humidity subplot)  
 `Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project  
 `EXAMPLE_sensor_0.txt` `EXAMPLE_weather.txt` `EXAMPLE_sensor_1.txt` --- Data 
 files taken in the new format
