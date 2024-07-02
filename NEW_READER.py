@@ -22,11 +22,12 @@ import numpy as np                    # This allows me to perform complex calcul
 ''' ==================================================== OVERVIEW ==================================================== '''
 ''' ================================================================================================================== '''
 
-''' This macro functions similarly as dataReader.py, but using pandas. The nice
- thing about pandas is that you can treat data from files as dataframes, which 
-make plotting a lot simpler because you don't need to split the data into lists 
-and loop through them. It's also nice because the index isn't necessary---you 
-can plot solely using the timestamp. '''
+''' This macro functions similarly as my previous and no longer listed 
+program dataReader.py, but using pandas instead of matplotlib directly. 
+The nice thing about pandas is that you can treat data from files as 
+dataframes, which make plotting a lot simpler because you don't need to 
+split the data into lists and loop through them. It's also nice because 
+the index isn't necessary---you can plot solely using the timestamp. '''
 
 ''' ================================================================================================================== '''
 ''' ============================================= PART i: DEFINING BOUNDS ============================================ '''
@@ -43,26 +44,35 @@ colors and markers included in matplotlib.pyplot for ease of definition. '''
 T = True
 F = False
 
+# Bounds for Y-Axes
 lower_hum_bound = 20                 # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
 upper_hum_bound = 90                 # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
 lower_temp_bound = 0                 # Lower bound on temperature (cannot be greater than upper_temp_bound)
 upper_temp_bound = 40                # Upper bound on temperature (cannot be less than lower_temp_bound)
+
+# Bounds for X-Axes
 assigned_start = F                   # Boolean that determines whether the user wants to specify the start date for plotting
 assigned_end = F                     # Boolean that determines whether the user wants to specify the end date for plotting
 start_date = "2024-06-25 01:00:00"   # Assigned start date for plotting (this is a placeholder date; will get reassigned if assigned_start == False)
 end_date = "2024-06-25 09:00:00"     # Assigned end date for plotting (same as above; wil get reassigned if assigned_end == False)
+
+# Bounds for Statistics
 assign_stat_start = F                # Boolean like "assigned_start," but for calculating statistics
 assign_stat_end = F                  # Boolean like "assigned_end," but for calculating statistics
 stat_start = "2024-06-25 02:00:00"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
 stat_end = "2024-06-25 09:00:00"     # Assigned end date for statistics (will get reassigned if assign_stat_end == False)
+
+# Updating Statistics
 update_stats = T                     # Boolean telling the program whether to continue printing statistics to the screen (used mainly for updating/non-updating files)
 
+# Plot Attributes
 n_desired_ticks = 10                              # Sometimes there are 11 ticks shown on the x-axis, but ultimately, we want constant and evenly-spaced ticks
 colors = ["cyan", "green", "yellow", "magenta"]   # List of colors for plotting
 markers = ["x", "v", "^", ".", ","]               # List of markers for plotting
 markersize = 3                                    # Size of markers plotted
 linewidth = 1                                     # Width of lines plotted
 
+# Optimal Humidity Range
 optimal_high = 60   # This is the upper limit of the optimal humidity range (used in line_plotter)
 optimal_low = 40    # This is the lower limit of the optimal humidity range (used in line_plotter)
 
@@ -70,14 +80,14 @@ optimal_low = 40    # This is the lower limit of the optimal humidity range (use
 ''' =========================================== PART ii: HELPER FUNCTIONS ============================================ '''
 ''' ================================================================================================================== '''
 
-''' This is the "initialization" section, where I define a few helper functions 
+''' This is the "initialization" section, where I define some helper functions 
 (defined in order of appearance in the program) that execute things that I need 
 to execute multiple times in the program. They will become more apparent later 
 in the program. '''
 
 ''' ================================================================================================================== '''
 
-# This function tells the user how to use the program.
+# This function tells the user how to use the program and doesn't directly affect the plotting or statistics calculations.
 def help_func():
     print("\nTips for Using Program\n")
     print("1) Must run with \"python NEW_READER [datafile1].txt [datafile2].txt ...\"")
@@ -179,7 +189,7 @@ def df_formatter(dataframe):
 def start_func(key_list, dictionary):
     cur_start = dictionary[key_list[0]].index.tolist()[0]                   # These variables keep track of the first data files given
     if (len(key_list) == 1):                                                # If there is only one data file given...
-        start = dictionary[key_list[0]].index.tolist()[0] 
+        start = dictionary[key_list[0]].index.tolist()[0]                   # ...start date is the first date in the data file 
     else:
         for i in range(len(key_list) - 1):                                  # Check if date in 1st occurs before 2nd
             if (pd.Timestamp(dictionary[key_list[i]].index.tolist()[0]) < pd.Timestamp(dictionary[key_list[i + 1]].index.tolist()[0])):   
@@ -245,7 +255,7 @@ def date_assigner(start, end, start_boolean, end_boolean, key_list, dictionary):
         sys.exit(1)
     return (starter, ender)
 
-# This function makes sure all the bounds/bound indices are appropriate and lets the user know if they aren't..
+# This function makes sure all the bounds/bound indices are appropriate and lets the user know if they aren't.
 def bound_checker(low, high):
     if (low > high):
         print("At least one of your lower bounds is greater than its corresponding upper bound. This cannot occur.")
@@ -488,11 +498,12 @@ which takes a dataframe as its input.
 
 After doing all this, I then define a new list called "date_list," which is a 
 pandas object that creates a list of datetime objects between a start and end 
-date at a given frequency (for this case, I used every second since I collect 
-data every second). I defined the start and end dates using a functino called 
-"start_end," which takes a list of keys and a dictionary and sorts finds the 
-oldest and most recent dates in all the dataframes. The list "date_list" 
-denotes the x-bounds and the x-ticks on the plots. '''
+date at a given frequency (for this case, I used every second). I defined the 
+start and end dates using functions called "start_func" and "end_func," 
+respectively, which take a list of keys and a dictionary and sorts finds the 
+oldest (former) or most recent (latter) dates in all the dataframes. The list 
+"date_list" denotes the x-bounds and the x-ticks on the plots. I do the same 
+with analogous functions for the statistics dates. '''
 
 ''' ================================================================================================================== '''
 
@@ -502,7 +513,7 @@ for i in range(len(keys)):
 start_date, end_date = date_assigner(start_date, end_date, assigned_start, assigned_end, keys, sorted_df)
 stat_start, stat_end = date_assigner(stat_start, stat_end, assign_stat_start, assign_stat_end, keys, sorted_df)
 
-date_list = pd.date_range(start_date, end_date, freq = "s")   # Pandas date range from start_date to end_date with a frequencty of every second
+date_list = pd.date_range(start_date, end_date, freq = "s")   # Pandas date range from start_date to end_date with a frequency of every second
 
 ''' ================================================================================================================== '''
 ''' ============================================ PART 5: REVISTING BOUNDS ============================================ '''
@@ -510,7 +521,7 @@ date_list = pd.date_range(start_date, end_date, freq = "s")   # Pandas date rang
 
 ''' This section does more with the bounds defined in Part i, namely making 
 sure they're valid and also defining some more bounds that depend on the 
-ones we defined above using the functions defined in Part ii. '''
+ones we defined using the functions from Part ii. '''
 
 ''' ================================================================================================================== '''
 
@@ -524,39 +535,37 @@ stat_title_start, stat_title_end = stat_bounds(stat_start, stat_end)
 ''' =========================================== PART 6: PLOTTING HUMIDITIES ========================================== '''
 ''' ================================================================================================================== '''
 
-''' This section of code plots the humidities from each sensor and wttr. To do 
-this, I first define the plot itself and an axis as subplots of each other. The 
-plot ends up being defined as a figure (figure 1, specifically, becasue I'm 
-plotting two different plots from the same graph). The axis, however, is the 
-thing that takes the data. I loop over all the dataframes in my sorted 
-dictionary and try to find the weather data because it contains an extra column 
-for preciptation that I plot on the same graph with the humidities. (The 
-weather data is found in the first dataframe (the 0th, if you will). I check 
-whether the dataframe has more than four columns, and if it does, I know that 
-this is the weather data. This is different from before when I checked if the 
-data had more than five columns because I merged two of the columns and made it
-the index.) For the weather data, I set the color to "red" and the graph label 
-to "CVille." I also define a separate axis for plotting the precipitation and 
-define the color, marker, title, and limits of it. For the sensor data, I set 
-the color equal to one of the elements in the list "color" and the graph label 
-equal to the sensor that took the data. Then, I define the humidity axis. If 
-the index in the for loop is zero, then I define the axis, but if it isn't, 
-then I simply plot the data on that axis because it already exists. The nice 
-thing about doing it this way is that no matter whether I have weather data or 
-only sensor data, the axis is defined.
+''' This section of code plots the humidities from each sensor and WTTR. To 
+do this, I first define the plot itself and an axis as subplots of each other. 
+The plot ends up being defined as a figure (figure 1, specifically, because 
+I'm plotting two different plots from the same graph). The axis, however, is 
+the thing that takes the data. I loop over all the dataframes in my sorted 
+dictionary and try to find the weather data, which doesn't contain the port 
+number in its columns. (The weather data is found in the first dataframe 
+(the 0th, if you will). For the weather data, I set the color to "red" and 
+the graph label to "CVille." I also define a separate axis for plotting the 
+precipitation and define the color, marker, title, and limits of it. For the 
+sensor data, I set the color equal to one of the elements in the list "color" 
+and the graph label equal to the sensor that took the data. Then, I define 
+the humidity axis as well as a separate axis for the absolute humidity values 
+(which are blue with a border the same color as the sensor data to which it 
+corresponds). If the index in the for loop is zero, then I define the axis, 
+but if it isn't, then I simply plot the data on that axis because it already 
+exists. The nice thing about doing it this way is that no matter whether I 
+have weather data or only sensor data, the axis is defined.
 
 After defining the labels and axes, I configure a bunch of other things with 
 the plots, including x- and y-labels, the x-ticks (which are defined as dates 
 at an interval given by the length of "date_list" divided by the number of 
-desired ticks (I end up getting one extra tick, but that is a least-concern 
-worry)), bounds for the x- and y-axes, a legend, and a plot title (all done 
-with the helper function "hums_axis." For data-specific configurations, I 
-define things using the axis; for whole-plot configurations, I define things 
-using "plt."
+desired ticks (I end up getting one extra tick sometimes, but that is a 
+least-concern worry)), bounds for the x- and y-axes, a legend, and a plot 
+title (all done with the helper function "hums_axis." For data-specific 
+configurations, I define things using the axis; for whole-plot configurations, 
+I define things using "plt."
 
 In addition to defining my graphs, I also define a new dataframe called 
-"stats," in which I display the mean and standard deviation of every 
-data file included for a given range.  '''
+"stats," in which I display the mean and standard deviation of the humidity 
+and temperature of every data file included for a given range.  '''
 
 ''' ================================================================================================================== '''
 
@@ -653,11 +662,9 @@ open all the files given to the program from the command line. I then read each
 line of the files, and since we're in an infinite while loop, it constantly 
 gathers any new data that was added to them. Next, I define the last line as a 
 dataframe, give it header names based on whether it was sensor or weather data, 
-and format it using "df_formatter." (Importantly, I use a try-except statement 
-here, which checks to see if a line was added. If it was, then I do the above, 
-but if it wasn't, then it's a static dataset, and I exit the program.) Lastly, 
-I do all the things I did in Parts 6 and 7 with plotting and configuring the 
-data. I then display the data on the already created plot. 
+and format it using "df_formatter." Lastly, I do all the things I did in Parts 
+6 and 7 with plotting and configuring the data. I then display the data on the 
+already created plot. 
 
 The complications with all this are the following:
 1) I'm working with a VERY nested loop, so indentations are VERY important.
@@ -747,8 +754,8 @@ while True:
         temps_axis(ax_temp, lower_temp_bound, upper_temp_bound, start_date, end_date, title_start_date, title_end_date, date_list, n_desired_ticks)
         if (update_stats == True):
             printing_stats(stats, stat_title_start, stat_title_end)
-        end_time = int(time.time())                                    # Current time after the loop runs
-        if ((end_time - start_time) > 3600):                           # Every hour (in seconds), save the plot
+        end_time = int(time.time())                                   # Current time after the loop runs
+        if ((end_time - start_time) > 3600):                          # Every hour (in seconds), save the plot
             photo_saver(png_start_date, png_end_date)
             start_time = end_time
         plt.show(block = False)
