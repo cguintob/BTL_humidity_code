@@ -101,7 +101,7 @@ cause the program to sleep for an hour to let it reset. '''
 while True:
     try:
         day = date.today()
-        cur_time = datetime.datetime.now().strftime("%H:%M:%S")   # Named "cur_time" for "current time" so it didn't conflict with time module
+        cur_time = datetime.datetime.now().strftime("%H:%M:%S")                          # Named "cur_time" for "current time" so it didn't conflict with time module
         try:
             res = sess.get(url)
             converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"})   # Replaces all these delimiters with ""
