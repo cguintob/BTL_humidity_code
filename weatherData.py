@@ -121,7 +121,7 @@ while True:
             weather_data.close()
             print(str(day) + " " + str(cur_time))
             print("Weather")
-            print("Humidity (%), Temperature (F), Precipitation (mm/3hr)")
+            print("Humidity (%), Temperature (\u00B0F), Precipitation (mm/3hr)")
             print(converted_string)
             print("\n")
         except requests.exceptions.ConnectionError:

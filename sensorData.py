@@ -156,7 +156,7 @@ def readserial(comport, baudrate, timestamp = False):
                             print("Humidity: " + data + "%")
                         else:
                             data_file.write(str(data))
-                            print("Temperature: " + data + " C\n\n")
+                            print("Temperature: " + data + "\u00B0C\n\n")
                             data_file.write("\n")
                             data_file.close()
                         counter += 1
