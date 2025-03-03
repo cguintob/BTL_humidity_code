@@ -45,21 +45,21 @@ T = True
 F = False
 
 # Bounds for Y-Axes
-lower_hum_bound = 20                 # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
-upper_hum_bound = 90                 # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
+lower_hum_bound = 0                  # Lower bound on humidity (cannot be greater than upper_hum_bound, lower bound (realistically): 0)
+upper_hum_bound = 100                # Upper bound on humidity (cannot be less than lower_hum_bound, upper bound (realistically): 100)
 lower_temp_bound = 0                 # Lower bound on temperature (cannot be greater than upper_temp_bound)
 upper_temp_bound = 40                # Upper bound on temperature (cannot be less than lower_temp_bound)
 
 # Bounds for X-Axes
 assigned_start = F                   # Boolean that determines whether the user wants to specify the start date for plotting
 assigned_end = F                     # Boolean that determines whether the user wants to specify the end date for plotting
-start_date = "2024-06-25 01:00:00"   # Assigned start date for plotting (this is a placeholder date; will get reassigned if assigned_start == False)
+start_date = "2024-12-02 00:00:00"   # Assigned start date for plotting (this is a placeholder date; will get reassigned if assigned_start == False)
 end_date = "2024-06-25 09:00:00"     # Assigned end date for plotting (same as above; wil get reassigned if assigned_end == False)
 
 # Bounds for Statistics
 assign_stat_start = F                # Boolean like "assigned_start," but for calculating statistics
 assign_stat_end = F                  # Boolean like "assigned_end," but for calculating statistics
-stat_start = "2024-06-25 02:00:00"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
+stat_start = "2024-12-02 00:00:00"   # Assigned start date for statistics (will get reassigned if assign_stat_start == False)
 stat_end = "2024-06-25 09:00:00"     # Assigned end date for statistics (will get reassigned if assign_stat_end == False)
 
 # Updating Statistics
