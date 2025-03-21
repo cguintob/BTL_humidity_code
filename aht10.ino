@@ -5,6 +5,7 @@ AHTxx aht10;
 // This code initializes the sensor. It is run once.
 void setup() {
      Serial.begin(9600);                        // Begin after 9600 ms
+     delay(4800);
      Serial.println("Starting up...");          // Print on a new line. For checkpointing purposes
      while (aht10.begin() != true) {            // If the sensor isn't working...
      	   Serial.println("Sensor not running.");   // ...print this...
