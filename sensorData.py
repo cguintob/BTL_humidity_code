@@ -117,7 +117,7 @@ def readserial(comport, baudrate, timestamp = False):
                 print(data)
                 if (data == "AHT10 running"):
                     tester = 1
-            elif ((data == "") or (data == "0.00") or (data == "-50.00") or (data == "..") or (data == "up..")):
+            elif ((data == "") or (data == "0.00") or (data == "-50.00") or (data == "..") or (data == "up..") or (data == "0")):
                 continue
             elif (data == "Done!"):
                 print(data)
@@ -126,40 +126,43 @@ def readserial(comport, baudrate, timestamp = False):
                 if (tester == 0):
                     continue
                 else:
-                    day = date.today()
-                    cur_time = datetime.datetime.now().strftime("%H:%M:%S")   # Named "cur_time" for "current time" so it didn't conflict with time module (if I included it)
-                    ''' This checks to see if the data from the Arduino 
-                    is an integer, indicating that it's a counter. If 
-                    that counter is even, a humidity measurement will 
-                    be written to the file; if that counter is odd, a 
-                    temperature measurement will be written to the 
-                    file. This code was implemented 5/17/2024. '''
-                    try:
-                        if (isinstance(int(data), int) == True):
-                            counter = int(data)
-                        else:
-                            print("Raising ValueError in try portion of try-except statement.")
-                            raise ValueError
-                    except ValueError:
-                        if (counter % 2 == 0):
-                            data_file = open(file1, "a")
-                            data_file.write(str(port_num))
-                            data_file.write(" ")
-                            data_file.write(str(day))
-                            data_file.write(" ")
-                            data_file.write(str(cur_time))
-                            data_file.write(" ")
-                            data_file.write(str(data))
-                            data_file.write(" ")
-                            print(str(day) + " " + str(cur_time))
-                            print("Sensor {0}".format(int(port_num) + 1))
-                            print("Humidity: " + data + "%")
-                        else:
-                            data_file.write(str(data))
-                            print("Temperature: " + data + "\u00B0C\n\n")
-                            data_file.write("\n")
-                            data_file.close()
-                        counter += 1
+                    if ((data == "") or (data == "0.00") or (data == "-50.00") or (data == "..") or (data == "up..") or (data == "0")):
+                        continue
+                    else:
+                        day = date.today()
+                        cur_time = datetime.datetime.now().strftime("%H:%M:%S")   # Named "cur_time" for "current time" so it didn't conflict with time module (if I included it)
+                        ''' This checks to see if the data from the Arduino 
+                        is an integer, indicating that it's a counter. If 
+                        that counter is even, a humidity measurement will 
+                        be written to the file; if that counter is odd, a 
+                        temperature measurement will be written to the 
+                        file. This code was implemented 5/17/2024. '''
+                        try:
+                            if (isinstance(int(data), int) == True):
+                                counter = int(data)
+                            else:
+                                print("Raising ValueError in try portion of try-except statement.")
+                                raise ValueError
+                        except ValueError:
+                            if (counter % 2 == 0):
+                                data_file = open(file1, "a")
+                                data_file.write(str(port_num))
+                                data_file.write(" ")
+                                data_file.write(str(day))
+                                data_file.write(" ")
+                                data_file.write(str(cur_time))
+                                data_file.write(" ")
+                                data_file.write(str(data))
+                                data_file.write(" ")
+                                print(str(day) + " " + str(cur_time))
+                                print("Sensor {0}".format(int(port_num) + 1))
+                                print("Humidity: " + data + "%")
+                            else:
+                                data_file.write(str(data))
+                                print("Temperature: " + data + "\u00B0C\n\n")
+                                data_file.write("\n")
+                                data_file.close()
+                            counter += 1
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt")
             sys.exit(1)     
