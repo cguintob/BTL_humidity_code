@@ -365,7 +365,7 @@ def printing_stats(dataframe, title_start, title_end):
 # This function saves the plot to a PNG.
 def photo_saver(photo_start, photo_end):
     plt.savefig("data_graphs/{0}_to_{1}.png".format(photo_start, photo_end))
-    print("Saved to ~/BTL_humidity_code/data_graphs as {0}_to_{1}.png".format(photo_start, photo_end))
+    print("Saved to ~/BTL_humidity_code/graphs as {0}_to_{1}.png".format(photo_start, photo_end))
     print("=================================================================================")
     
 ''' ================================================================================================================== '''
