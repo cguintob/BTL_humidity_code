@@ -1,25 +1,19 @@
 ## OVERVIEW
 This is a side-project of the BTL research and development project. The aim is 
 to measure the relative humidity and temperature in the assembly rooms where
-sensor modules are being cured to understand better the environment in which
-they're being cured.
+sensor modules (SMs) are being cured to understand better these environments and
+ensure that our SMs are of optimal quality.
 
-We use an Elegoo MEGA2560 R3 Arduino board with a fully calibrated ASAIR AHT10
-humidity and temperature sensor connected to it to gather the data. The Arduino
-code is written in C++ and, once run, sends its data to a script written in 
-Python, which receives the data from the Arduino and organizes it into a text
-file. Then, we use another Python script to plot the data. A detailed
-description of the project can be found in
+We use Arduino Elegoo MEGA2560 R3 and DUE boards with fully calibrated ASAIR
+AHT10 humidity and temperature sensors connected to them to gather the data.
+The Arduino code is written in C++ and, once run, sends its data to a script
+written in Python, which receives the data from the Arduinos and organizes
+them into text files. Then, we use another Python script to plot the data.
+A detailed description of the project can be found in
 `Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf`.
 
 
 ## REPOSITORY CONTENTS
-### Sensor Files
-`aht10.ino` --- Initializes the sensor, measures humidity and temperature in 
-room, and sends information to serial port  
-`AHTxx.cpp` --- Arduino library  
-`AHTxx.h`   --- Header file for Arduino library
-
 ### Python Scripts
 `sensorData.py` --- Takes sensor data from serial port and writes it to data 
 file
@@ -29,19 +23,25 @@ writes it to separate data file
 arbitrary number of data files (in a new format) in any order and can plot 
 updating data
 
-### Data Files, Plots, and Other Results
+### Sensor Files (Contained in `aht10` Folder)
+`aht10.ino` --- Initializes the sensor, measures humidity and temperature in 
+room, and sends information to serial port  
+`AHTxx.cpp` --- Arduino library  
+`AHTxx.h`   --- Header file for Arduino library
+
+### Example Data and Plots (Contained in `examples` Folder)
 `EXAMPLE_hums_graph.png` `EXAMPLE_temps_graph.png` --- Example graphs in the 
 newer format  
 `2024-07-01_at_10:39:43_to_2024-07-02_at_12:38:05.png` --- Example graph in 
 the newest format (both humidities and temperatures are plotted on the 
 same graph with precipitation on temperature subplot and absolute humidity
-on humidity subplot)  
-`Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project  
+on humidity subplot)    
 `EXAMPLE_sensor_0.txt` `EXAMPLE_weather.txt` `EXAMPLE_sensor_1.txt` --- Data 
 files taken in the new format
 
 ### Miscellaneous/Housekeeping
 `README.md` --- Contains information about project and how to use programs  
+`Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project
 `.gitignore.txt` --- Contains files that are not tracked by Git  
 `.gitattributes` --- Used for pushing files that are larger than the maximum 
 allowed size for pushing
@@ -49,11 +49,15 @@ allowed size for pushing
 
 ## USING `aht10.ino`
 The first section of `aht10.ino` initializes the sensor to do the following:
-1. Begin collecting data after 9600 ms
-2. Print "Starting up..."
-3. Check to see if the sensor is running and, if not, delay the data collection 
+1. Begin collecting data after 9600 ms.
+2. Delay operation by 4800 ms.
+3. Print "Starting up..."
+4. Check to see if the sensor is running and, if not, delay the data collection 
 by 5000 ms and print "Sensor not running."
-4. Print "AHT10 running" and set the cycle mode if the sensor is running.  
+5. Print "AHT10 running" and set the cycle mode if the sensor is running.  
+
+The line `delay(4800)` was added March 21, 2025 to allow two different Arduino
+boards to be used simultaneously.
 
 The second section of the program is an infinite loop that collects measurements
  indefinitely via the following:
@@ -129,6 +133,10 @@ will *not* be registered until you compile and upload the script using the
 Arduino IDE. Since we're not changing `aht0.ino` enough for this to occur, I
 am not worrying too hard about it.
 
+NOTE: As of 7/15/2025, to switch between different boards, you must execute both
+the "compile" and "upload" commands. The single command does not seem to work
+when using multiple Arduino boards.
+
 
 ## USING `sensorData.py`
 `sensorData.py` is used with the following command:
@@ -138,6 +146,10 @@ am not worrying too hard about it.
 2. `sensorData.py` --- The Python program
 3. `[INTEGER]` --- A number telling the program which serial port to use
 4. `[DATA FILE].txt` --- Includes measurements from the sensor
+
+To reduce confusion, name sensor data files with the following format:
+
+`sensor[# OF SENSOR BASED ON SERIAL PORT]_[ABBREVIATION OF MONTH WHEN DATA COLLECTION STARTS][# OF DAY WHEN DATA COLLECTION STARTS].txt`
 
 After the program is run, it will print whatever is sent to the serial port by
 `aht10.ino` to the screen. Those values, as well as the date and time of the 
@@ -165,6 +177,10 @@ goes for all the commands (for here, I'll use `python`).
 This works the same as `sensorData.py`, only not as a root user:
 
 `python weatherData.py [DATA FILE].txt`
+
+To reduce confustion, name weather data files with the following format:
+
+`weather_[ABBREVIATION OF MONTH WHEN DATA COLLECTION STARTS][# OF DAY WHEN DATA COLLECTION STARTS].txt`
 
 It also doesn't take a port number.
 
@@ -352,6 +368,17 @@ fetched, while the `--hard` option changes your files in the working tree to
 match the files in `origin/master`.
 
 [Source](https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files)
+
+7/15/2025 UPDATE: In the event that several branches are in use, use the following
+commands:
+
+`git checkout [NEW BRANCH]` (switch to new branch)  
+`git push -u origin [NEW BRANCH]` (push to new branch)
+
+For some general commands, use:
+
+`git checkout -b [NEW BRANCH]` (create and switch to new branch)
+`git branch -a` (see all branches)
 
 ### Initializing Repository and Connecting to GitHub
 Check to see if git is installed on the machine you want to connect to
