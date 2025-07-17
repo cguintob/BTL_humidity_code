@@ -1,5 +1,5 @@
 ## OVERVIEW
-This is a side-project of the BTL research and development project. The aim is 
+This project supports the Barrel Timing Layer (BTL) assembly project. The aim is 
 to measure the relative humidity and temperature in the assembly rooms where
 sensor modules (SMs) are being cured to understand better these environments and
 ensure that our SMs are of optimal quality.
@@ -16,7 +16,7 @@ A detailed description of the project can be found in
 ## REPOSITORY CONTENTS
 ### Python Scripts
 `sensorData.py` --- Takes sensor data from serial port and writes it to data 
-file
+file  
 `weatherData.py` --- Fetches weather data from Charlottesville using WTTR and
 writes it to separate data file  
 `NEW_READER.py` --- An updated plotting script that uses pandas; can plot an 
@@ -41,7 +41,7 @@ files taken in the new format
 
 ### Miscellaneous/Housekeeping
 `README.md` --- Contains information about project and how to use programs  
-`Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project
+`Guinto-Brody_BTL_Humidity_Sensor_Project_2024.pdf` --- Report about project  
 `.gitignore.txt` --- Contains files that are not tracked by Git  
 `.gitattributes` --- Used for pushing files that are larger than the maximum 
 allowed size for pushing
