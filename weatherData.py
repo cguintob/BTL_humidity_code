@@ -22,7 +22,7 @@ access in case they need to be changed. '''
 ''' ================================================================================================================== '''
 
 rest_time = 10                                           # This variable tells us how often we want to get weather data. 
-url = "http://wttr.in/Charlottesville?format=%h+%t+%p"   # This is the URL from which we're fetching data.
+url = "http://wttr.in/Charlottesville?u&format=%h+%t+%p"   # This is the URL from which we're fetching data.
 
 ''' ================================================================================================================== '''
 ''' ========================================= PART 1: COMMAND-LINE ARGUMENTS ========================================= '''
@@ -104,7 +104,7 @@ while True:
         cur_time = datetime.datetime.now().strftime("%H:%M:%S")                          # Named "cur_time" for "current time" so it didn't conflict with time module
         try:
             res = sess.get(url)
-            converted_string = res.text.translate({ord(i): None for i in "%+F\xb0mm"})   # Replaces all these delimiters with ""
+            converted_string = res.text.translate({ord(i): None for i in "%+FC\xb0mm"})   # Replaces all these delimiters with ""
             if ("Unknown location" in converted_string):
                 print("WTTR had too many requests. Let's let it reset. Check back in an hour.")
                 time.sleep(3600)

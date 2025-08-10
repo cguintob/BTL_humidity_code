@@ -2,6 +2,7 @@ import serial               # Lets the Arduino send its information to the serve
 import datetime             # Contains information about the date and time of either current moments or moments in the past and future
 from datetime import date   # Module in "datetime" that specifically accesses the date
 import sys                  # Allows the user to use command line arguments
+from sys import platform
 
 ''' ================================================================================================================== '''
 ''' ==================================================== OVERVIEW ==================================================== '''
@@ -173,18 +174,31 @@ def readserial(comport, baudrate, timestamp = False):
 
 # This tells the program where to look for the AHT10 program.
 if __name__ == '__main__':
-    if (int(port_num) == 0):
-        # Format: readserial([COM port], [Baudrate], [Show timestamp])
-        readserial('/dev/ttyACM0', 9600, True)
-    elif (int(port_num) == 1):
-        readserial('/dev/ttyACM1', 9600, True)
-    elif (int(port_num) == 2):
-        readserial('/dev/ttyACM2', 9600, True)
-    elif (int(port_num) == 3):
-        readserial('/dev/ttyACM3', 9600, True)
+    if (platform == "darwin"):
+        if (int(port_num) == 0):
+            readserial('/dev/cu.usbmodem1101', 9660, True)
+        elif (int(port_num) == 1):
+            readserial('/dev/cu.usbmodem1102', 9600, True)
+        elif (int(port_num) == 2):
+            readserial('/dev/cu.usbmodem1103', 9600, True)
+        elif (int(port_num) == 3):
+            readserial('/dev/cu.usbmodem1104', 9600, True)
+        else:
+            print("No COM port specified.")
+            sys.exit(1)
     else:
-        print("No COM port specified.")
-        sys.exit(1)
+        if (int(port_num) == 0):
+            # Format: readserial([COM port], [Baudrate], [Show timestamp])
+            readserial('/dev/ttyACM0', 9600, True)
+        elif (int(port_num) == 1):
+            readserial('/dev/ttyACM1', 9600, True)
+        elif (int(port_num) == 2):
+            readserial('/dev/ttyACM2', 9600, True)
+        elif (int(port_num) == 3):
+            readserial('/dev/ttyACM3', 9600, True)
+        else:
+            print("No COM port specified.")
+            sys.exit(1)
 
 ''' ================================================================================================================== '''
 ''' ============================================ PART 4: ACKNOWLEDGEMENTS ============================================ '''
